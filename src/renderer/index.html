@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Conversor de Vídeo</title>
+  <link rel="stylesheet" href="./styles/styles.css" />
+</head>
+
+<body>
+  <form>
+    <label for="input-file">Arquivo de entrada:</label>
+    <input type="file" id="input-file" multiple />
+
+    <label for="output-format">Formato de saída:</label>
+    <select id="output-format">
+      <option value="mp4">MP4</option>
+      <option value="avi">AVI</option>
+      <option value="mkv">MKV</option>
+    </select>
+
+    <div class="progess_Container">
+      <progress id="progress-bar" value="0" max="100"></progress>
+      <span id="progress-text">0%</span>
+    </div>
+
+    <button type="submit" id="convert-button">Converter</button>
+  </form>
+
+  <script src="./renderer.js"></script>
+  <script></script>
+</body>
+
+</html>

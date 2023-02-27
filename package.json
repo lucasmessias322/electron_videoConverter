@@ -1,0 +1,19 @@
+{
+  "name": "electron_videoconverter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/main.js",
+  "scripts": {
+    "dev": "npx electronmon .",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^23.1.1"
+  },
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
