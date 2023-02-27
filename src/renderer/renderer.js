@@ -1,45 +1,66 @@
 const { ipcRenderer } = require("electron");
+const ffmpeg = require("fluent-ffmpeg");
+const path = require("path");
+const fs = require("fs");
 
 const form = document.querySelector("form");
 const inputField = document.querySelector("#input-file");
 const outputFormatField = document.querySelector("#output-format");
-const convertButton = document.querySelector("#convert-button");
 const progressBar = document.querySelector("#progress-bar");
 const progressText = document.querySelector("#progress-text");
+const progressVideo = document.querySelector("#progress-video");
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const input = inputField.files[0].path;
+  const inputFiles = inputField.files;
   const outputFormat = outputFormatField.value;
-  const output = `${input.slice(0, -4)}.${outputFormat}`;
 
   const destination = await ipcRenderer.invoke("select-directory");
   if (!destination) return;
 
-  ipcRenderer.send("convert-video", { input, output, destination });
+  for (let i = 0; i < inputFiles.length; i++) {
+    const input = inputFiles[i].path;
+    const output = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
+    const outputPath = path.join(destination, output);
+    const currentVideo = inputFiles[i].name;
+    progressVideo.innerText = `Converting: ${currentVideo}`;
+    await convert(input, outputPath, destination);
+  }
 
-  convertButton.disabled = true;
-  progressBar.style.display = "block";
-  progressBar.value = 0;
-  progressText.style.display = "block";
-  progressText.innerHTML = 0 + "%";
+  // reset progress video text after all conversions are done
+  progressVideo.innerText = "";
 });
 
-ipcRenderer.on("conversion-progress", (event, progress) => {
-  progressBar.value = progress;
-  progressText.innerHTML = Math.floor(progress) + "%";
-});
+function convert(inputFile, outputFile, destination) {
+  return new Promise((resolve, reject) => {
+    const outputPath = path.join(destination, path.basename(outputFile));
 
-ipcRenderer.on("video-converted", (event, message) => {
-  alert(message);
-  convertButton.disabled = false;
-  progressBar.style.display = "none";
-  progressText.style.display = "none";
-});
+    const command = ffmpeg(inputFile)
+      .output(outputPath)
+      .on("progress", (progress) => {
+        progressBar.style.display = "block";
+        progressText.style.display = "block";
+        progressBar.value = progress.percent;
+        progressText.innerText = `${Math.round(progress.percent)}%`;
+      })
+      .on("end", () => {
+        progressBar.style.display = "none";
+        progressText.style.display = "none";
+        progressVideo.innerText = "";
 
-ipcRenderer.on("video-convert-error", (event, error) => {
-  alert(`Erro durante a conversão: ${error}`);
-  convertButton.disabled = false;
-  progressBar.style.display = "none";
-});
+        fs.copyFile(outputPath, outputFile, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      })
+      .on("error", (error) => {
+        reject(error);
+      });
+
+    command.run();
+  });
+}

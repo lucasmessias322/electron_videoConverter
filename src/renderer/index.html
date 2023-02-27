@@ -2,33 +2,41 @@
 <html>
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Conversor de Vídeo</title>
-  <link rel="stylesheet" href="./styles/styles.css" />
+  <meta charset="UTF-8">
+  <title>Electron FFmpeg Converter</title>
+  <link rel="stylesheet" href="./styles/styles.css">
 </head>
 
 <body>
-  <form>
-    <label for="input-file">Arquivo de entrada:</label>
-    <input type="file" id="input-file" multiple />
+  <div class="container">
+    <h1>Conversor de videos</h1>
+    <form>
+      <label for="input-file">Escolha um ou mais videos:</label>
+      <input type="file" id="input-file" multiple>
+      <br>
+      <label for="output-format">Output Format:</label>
+      <select id="output-format">
+        <option value="mp4">MP4</option>
+        <option value="avi">AVI</option>
+        <option value="mov">MOV</option>
+      </select>
+      <br>
+      <button id="convert-button">Convert</button>
+    </form>
+    <br>
 
-    <label for="output-format">Formato de saída:</label>
-    <select id="output-format">
-      <option value="mp4">MP4</option>
-      <option value="avi">AVI</option>
-      <option value="mkv">MKV</option>
-    </select>
 
-    <div class="progess_Container">
+
+    <div class="progress-bar_container">
+
+      <p id="progress-video"></p>
       <progress id="progress-bar" value="0" max="100"></progress>
-      <span id="progress-text">0%</span>
+      <p id="progress-text">0%</p>
     </div>
+  </div>
 
-    <button type="submit" id="convert-button">Converter</button>
-  </form>
 
   <script src="./renderer.js"></script>
-  <script></script>
 </body>
 
 </html>

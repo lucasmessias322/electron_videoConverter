@@ -5,16 +5,21 @@ const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
 let mainWindow;
+let conversionQueue = [];
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       preload: path.join(__dirname, "preload.js"),
     },
+    maximizable: false,
+    fullscreen: false,
+    resizable: false,
   });
 
   mainWindow.webContents.openDevTools();
@@ -46,31 +51,51 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.handle("select-directory", async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
-  });
-
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
-  }
+ipcMain.handle("select-directory", async (event) => {
+  const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
+  if (result.canceled) return null;
+  return result.filePaths[0];
 });
 
 ipcMain.on("convert-video", (event, arg) => {
-  const { input, output, destination } = arg;
+  conversionQueue.push(arg);
+  if (conversionQueue.length === 1) {
+    convertNextVideo(event.sender);
+  }
+});
 
+function convertNextVideo(sender) {
+  if (conversionQueue.length === 0) {
+    sender.send("conversion-queue-finished");
+    return;
+  }
+
+  const { input, output, destination } = conversionQueue[0];
   const outputPath = path.join(destination, path.basename(output));
 
   ffmpeg(input)
     .output(outputPath)
     .on("progress", (progress) => {
-      event.sender.send("conversion-progress", progress.percent);
+      sender.send("conversion-progress", {
+        progress: progress.percent,
+        input: input,
+      });
     })
     .on("end", () => {
-      event.sender.send("video-converted", "Conversão concluída com sucesso!");
+      sender.send("video-converted", {
+        message: "Conversão concluída com sucesso!",
+        input: input,
+      });
+      conversionQueue.shift();
+      convertNextVideo(sender);
     })
     .on("error", (err) => {
-      event.sender.send("video-convert-error", err.message);
+      sender.send("video-convert-error", {
+        error: err.message,
+        input: input,
+      });
+      conversionQueue.shift();
+      convertNextVideo(sender);
     })
     .run();
-});
+}
