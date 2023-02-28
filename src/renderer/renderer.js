@@ -9,8 +9,24 @@ const outputFormatField = document.querySelector("#output-format");
 const progressBar = document.querySelector("#progress-bar");
 const progressText = document.querySelector("#progress-text");
 const progressVideo = document.querySelector("#progress-video");
+const videosForConverteContainer = document.querySelector(
+  "#videos_for_converte_Container"
+);
 
 const videoList = document.querySelector("#video-list");
+
+// quando tiver arquivos selecionados no inpute file ele ira exibir no html
+inputField.addEventListener("change", () => {
+  const inputFiles = inputField.files;
+  videosForConverteContainer.innerHTML = "";
+
+  for (let i = 0; i < inputFiles.length; i++) {
+    const spanTag = document.createElement("span");
+    spanTag.setAttribute("id", inputFiles[i].name);
+    spanTag.innerText = inputFiles[i].name;
+    videosForConverteContainer.appendChild(spanTag);
+  }
+});
 
 function addVideoToList(video) {
   const item = document.createElement("span");
@@ -33,12 +49,10 @@ form.addEventListener("submit", async (event) => {
   for (let i = 0; i < inputFiles.length; i++) {
     const input = inputFiles[i].path;
     const output = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
-    const videoName = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
     const outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
-    // progressVideo.innerText = `Converting: ${currentVideo}`;
 
-    await convert(videoName, input, outputPath, destination);
+    await convert(currentVideo, input, outputPath, destination);
   }
 
   progressVideo.innerText = "";
@@ -47,6 +61,7 @@ form.addEventListener("submit", async (event) => {
 function convert(videoName, inputFile, outputFile, destination) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(destination, path.basename(outputFile));
+    const fileConvertedSpanTag = document.getElementById(videoName);
 
     const command = ffmpeg(inputFile)
       .output(outputPath)
@@ -56,11 +71,14 @@ function convert(videoName, inputFile, outputFile, destination) {
         progressBar.value = progress.percent;
         progressText.innerText = `${Math.round(progress.percent)}%`;
         progressVideo.innerText = `Converting: ${videoName}`;
+        fileConvertedSpanTag.classList.add("converting");
       })
       .on("end", () => {
         progressBar.style.display = "none";
         progressText.style.display = "none";
         progressVideo.innerText = "";
+        fileConvertedSpanTag.classList.remove("converting");
+        fileConvertedSpanTag.classList.add("converted");
 
         fs.copyFile(outputPath, outputFile, (err) => {
           if (err) {
