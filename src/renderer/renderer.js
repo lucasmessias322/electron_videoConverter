@@ -12,8 +12,24 @@ const progressVideo = document.querySelector("#progress-video");
 const videosForConverteContainer = document.querySelector(
   "#videos_for_converte_Container"
 );
-
 const videoList = document.querySelector("#video-list");
+
+let videoHistory = [];
+if (localStorage.getItem("videoHistory")) {
+  videoHistory = JSON.parse(localStorage.getItem("videoHistory"));
+}
+
+for (let i = 0; i < videoHistory.length; i++) {
+  const { name, convertedAt } = videoHistory[i];
+  const item = `
+   <tr>
+    <td class="videoName">
+    <span class="converted">${name}</span> </td>
+    <td class="convertVideoTime">
+    <span class="convertedAt">${convertedAt}</span></td>
+   </tr>`;
+  videoList.innerHTML += item;
+}
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 inputField.addEventListener("change", () => {
@@ -29,12 +45,22 @@ inputField.addEventListener("change", () => {
 });
 
 function addVideoToList(video) {
-  const item = document.createElement("span");
-  item.classList.add("converted");
-  item.textContent = video;
-  videoList.appendChild(item);
+  const now = new Date().toLocaleString();
 
-  console.log(video);
+  const item = `
+   <tr>
+    <td class="videoName">
+      <span class="converted">${video}</span>
+    </td>
+    <td class="convertVideoTime">
+    <span class="convertedAt">${now}</span></td>
+   </tr>`;
+
+  videoList.innerHTML += item;
+
+  videoHistory.push({ name: video, convertedAt: now });
+
+  localStorage.setItem("videoHistory", JSON.stringify(videoHistory));
 }
 
 form.addEventListener("submit", async (event) => {

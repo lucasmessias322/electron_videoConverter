@@ -67,6 +67,12 @@ section.left_side .container form div.container_output-format label {
   color: #c4c4c4;
 }
 section.left_side .container form div.container_output-format select {
+  background-color: #ce007f;
+  border-radius: 5px;
+  padding: 10px;
+  border: 1px white;
+  outline: none;
+  color: white;
   margin-bottom: 20px;
   font-size: 16px;
 }
@@ -127,7 +133,7 @@ section.left_side .container .progress-bar_container #progress-text {
 }
 
 section.right_side {
-  width: 40%;
+  width: 60%;
   height: 100vh;
   overflow: auto;
 }
@@ -136,19 +142,34 @@ section.right_side h2 {
   color: #ce007f;
   padding-bottom: 20px;
 }
-section.right_side div#video-list {
+section.right_side table#video-list {
   color: whitesmoke;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
 }
-section.right_side div#video-list span.converted {
+section.right_side table#video-list tr.table_options td {
+  width: 50%;
+}
+section.right_side table#video-list tr.table_options td h3 {
+  width: 100%;
+}
+section.right_side table#video-list tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+section.right_side table#video-list tr td {
+  padding: 0px 10px;
+}
+section.right_side table#video-list tr td.videoName span.converted {
   display: inline-block;
-  max-width: 400px;
+  max-width: 300px;
   white-space: nowrap;
   color: green;
   overflow: hidden !important;
   text-overflow: ellipsis;
   font-size: 14px;
-  margin-bottom: 5px;
+}
+section.right_side table#video-list tr td.convertVideoTime span.convertedAt {
+  color: rgb(228, 186, 0);
+  font-size: 14px;
 }/*# sourceMappingURL=styles.css.map */

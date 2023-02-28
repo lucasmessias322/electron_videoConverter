@@ -74,6 +74,12 @@ section.left_side {
         }
 
         select {
+          background-color: #ce007f;
+          border-radius: 5px;
+          padding: 10px;
+          border: 1px white;
+          outline: none;
+          color: white;
           margin-bottom: 20px;
           font-size: 16px;
         }
@@ -146,7 +152,7 @@ section.left_side {
 }
 
 section.right_side {
-  width: 40%;
+  width: 60%;
   height: 100vh;
   overflow: auto;
 
@@ -155,21 +161,46 @@ section.right_side {
     color: #ce007f;
     padding-bottom: 20px;
   }
-  div#video-list {
+  table#video-list {
     color: whitesmoke;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
 
-    span.converted {
-      display: inline-block;
-      max-width: 400px;
-      white-space: nowrap;
-      color: green;
-      overflow: hidden !important;
-      text-overflow: ellipsis;
-      font-size: 14px;
-      margin-bottom: 5px;
+    tr.table_options {
+      td {
+        width: 50%;
+
+        h3 {
+          width: 100%;
+        }
+      }
+    }
+    tr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      td {
+        padding: 0px 10px;
+      }
+
+      td.videoName {
+        span.converted {
+          display: inline-block;
+          max-width: 300px;
+          white-space: nowrap;
+          color: green;
+          overflow: hidden !important;
+          text-overflow: ellipsis;
+          font-size: 14px;
+        }
+      }
+
+      td.convertVideoTime {
+        span.convertedAt {
+          color: rgb(228, 186, 0);
+          font-size: 14px;
+        }
+      }
     }
   }
 }
