@@ -13,7 +13,7 @@ const progressVideo = document.querySelector("#progress-video");
 const videoList = document.querySelector("#video-list");
 
 function addVideoToList(video) {
-  const item = document.createElement("div");
+  const item = document.createElement("span");
   item.classList.add("converted");
   item.textContent = video;
   videoList.appendChild(item);
@@ -36,7 +36,7 @@ form.addEventListener("submit", async (event) => {
     const videoName = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
     const outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
-    progressVideo.innerText = `Converting: ${currentVideo}`;
+    // progressVideo.innerText = `Converting: ${currentVideo}`;
 
     await convert(videoName, input, outputPath, destination);
   }
@@ -55,6 +55,7 @@ function convert(videoName, inputFile, outputFile, destination) {
         progressText.style.display = "block";
         progressBar.value = progress.percent;
         progressText.innerText = `${Math.round(progress.percent)}%`;
+        progressVideo.innerText = `Converting: ${videoName}`;
       })
       .on("end", () => {
         progressBar.style.display = "none";

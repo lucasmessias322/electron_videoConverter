@@ -1,16 +1,17 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require("electron");
 const path = require("path");
 const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
+const isDev = process.env.NODE_ENV !== "production";
 let mainWindow;
 let conversionQueue = [];
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 700,
+    width: 1024,
+    height: 600,
 
     webPreferences: {
       nodeIntegration: true,
@@ -22,7 +23,7 @@ function createWindow() {
     resizable: false,
   });
 
-  mainWindow.webContents.openDevTools();
+  if (isDev) mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(
     url.format({
@@ -37,17 +38,31 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+//Menu template
+const menu = [
+  // {
+  //   label: "Dev",
+  //   submenu: [{ label: "DevTools", click: () => app.getGPUInfo() }],
+  // },
+];
+
+app.whenReady().then(() => {
+  createWindow();
+
+  //Implement menu
+  const mainMenu = Menu.buildFromTemplate(menu);
+  Menu.setApplicationMenu(mainMenu);
+
+  app.on("activate", () => {
+    if (mainWindow === null) {
+      createWindow();
+    }
+  });
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
-  }
-});
-
-app.on("activate", () => {
-  if (mainWindow === null) {
-    createWindow();
   }
 });
 
