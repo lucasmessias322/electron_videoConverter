@@ -10,6 +10,17 @@ const progressBar = document.querySelector("#progress-bar");
 const progressText = document.querySelector("#progress-text");
 const progressVideo = document.querySelector("#progress-video");
 
+const videoList = document.querySelector("#video-list");
+
+function addVideoToList(video) {
+  const item = document.createElement("div");
+  item.classList.add("converted");
+  item.textContent = video;
+  videoList.appendChild(item);
+
+  console.log(video);
+}
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -22,17 +33,18 @@ form.addEventListener("submit", async (event) => {
   for (let i = 0; i < inputFiles.length; i++) {
     const input = inputFiles[i].path;
     const output = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
+    const videoName = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
     const outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
     progressVideo.innerText = `Converting: ${currentVideo}`;
-    await convert(input, outputPath, destination);
+
+    await convert(videoName, input, outputPath, destination);
   }
 
-  // reset progress video text after all conversions are done
   progressVideo.innerText = "";
 });
 
-function convert(inputFile, outputFile, destination) {
+function convert(videoName, inputFile, outputFile, destination) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(destination, path.basename(outputFile));
 
@@ -53,6 +65,8 @@ function convert(inputFile, outputFile, destination) {
           if (err) {
             reject(err);
           } else {
+            addVideoToList(videoName);
+
             resolve();
           }
         });
