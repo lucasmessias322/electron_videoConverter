@@ -119,15 +119,23 @@ header div.conversor_functions form #output-format {
   display: flex;
   flex-direction: column;
 }
-#videos_for_converte_Container span {
-  font-size: 14px;
+#videos_for_converte_Container div {
+  background-color: #252525;
   margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 20px;
 }
-#videos_for_converte_Container .converting {
-  color: yellow;
+#videos_for_converte_Container div span {
+  font-size: 16px;
+  padding: 2px 0px;
 }
-#videos_for_converte_Container .converted {
-  color: green;
+#videos_for_converte_Container div.converting {
+  background-color: #43009b;
+}
+#videos_for_converte_Container div.converted {
+  background-color: #1a1a1a;
 }
 #videos_for_converte_Container::-webkit-scrollbar-track {
   background-color: rgba(244, 244, 244, 0);

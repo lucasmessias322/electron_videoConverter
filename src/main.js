@@ -118,3 +118,34 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
     command.run();
   });
 }
+
+ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
+  await getVideoInformation(videoName, videoPath);
+});
+
+async function getVideoInformation(videoName, videoPath) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(videoPath, (err, metadata) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const duration = metadata.format.duration;
+      const codecs = metadata.streams.map((stream) => stream.codec_name);
+      const resolution = `${metadata.streams[0].width}x${metadata.streams[0].height}`;
+
+      resolve({
+        duration,
+        codecs,
+        resolution,
+      });
+
+      mainWindow.webContents.send("videoInformation-ready", videoName, {
+        duration,
+        codecs,
+        resolution,
+      });
+    });
+  });
+}

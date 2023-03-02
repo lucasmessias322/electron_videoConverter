@@ -17,17 +17,33 @@ let videoHistory = [];
 if (localStorage.getItem("videoHistory")) {
   videoHistory = JSON.parse(localStorage.getItem("videoHistory"));
 }
-
+async function getVideoInformation(videoName, videoPath) {
+  return await ipcRenderer.invoke("getVideo_information", videoName, videoPath);
+}
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
-inputField.addEventListener("change", () => {
+inputField.addEventListener("change", async () => {
   const inputFiles = inputField.files;
   videosForConverteContainer.innerHTML = "";
 
   for (let i = 0; i < inputFiles.length; i++) {
-    const spanTag = document.createElement("span");
-    spanTag.setAttribute("id", inputFiles[i].name);
-    spanTag.innerText = inputFiles[i].name;
-    videosForConverteContainer.appendChild(spanTag);
+    const item = `
+    <div id="${inputFiles[i].name}">
+      <span class="videoname" id="${inputFiles[i].name}_videoname">
+        <b>Nome do video: </b>${inputFiles[i].name}
+      </span>
+      <span class="videoduration" id="${inputFiles[i].name}_videoduration">
+       
+      </span>
+    </div>`;
+
+    videosForConverteContainer.innerHTML += item;
+
+    try {
+      // Pesquisa as infomaçoes dos videos
+      await getVideoInformation(inputFiles[i].name, inputFiles[i].path);
+    } catch (error) {
+      console.log(error);
+    }
   }
 });
 
@@ -78,8 +94,7 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
       spanTag.classList.add("converting");
     }
   }
-  progressBar.style.display = "block";
-  progressText.style.display = "block";
+
   progressVideo.innerText = `Converting: ${videoName}`;
   progressBar.value = progress;
   progressText.innerText = `${progress}%`;
@@ -87,8 +102,8 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
 
 ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   const fileConvertedSpanTag = document.getElementById(videoName);
-  progressBar.style.display = "none";
-  progressText.style.display = "none";
+  progressBar.value = 0;
+  progressText.innerHTML = "0%";
   progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
@@ -98,4 +113,14 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
 
 ipcRenderer.on("conversion-error", (event, videoName, error) => {
   window.alert(`Erro ao converter: ${videoName} erro: ${error}`);
+});
+
+// retorna as infomaçoes dos videos
+ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
+  console.log(videoInfo);
+  const videoduration = document.getElementById(`${videoName}_videoduration`);
+
+  if (videoduration) {
+    videoduration.innerHTML = `<b>Duração: </b>${videoInfo.duration}`;
+  }
 });

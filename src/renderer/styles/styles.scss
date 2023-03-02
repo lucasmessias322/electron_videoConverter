@@ -139,16 +139,25 @@ header {
   display: flex;
   flex-direction: column;
 
-  span {
-    font-size: 14px;
+  div {
+    background-color: #252525;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+
+    padding: 20px;
+    span {
+      font-size: 16px;
+      padding: 2px 0px;
+    }
+  }
+  div.converting {
+    background-color: #43009b;
   }
 
-  .converting {
-    color: yellow;
-  }
-  .converted {
-    color: green;
+  div.converted {
+    background-color: #1a1a1a;
   }
 
   &::-webkit-scrollbar-track {
