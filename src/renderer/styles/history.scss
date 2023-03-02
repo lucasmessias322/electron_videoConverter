@@ -1,0 +1,103 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: rgb(175, 175, 175);
+  text-decoration: none;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #252525;
+}
+
+header {
+  position: fixed;
+  background-color: #252525;
+  top: 0;
+  width: 100%;
+
+  div.menu {
+    display: flex;
+    align-items: center;
+    border-bottom: 0.5px solid rgb(51, 51, 51);
+
+    .menu_item {
+      padding: 10px;
+      cursor: pointer;
+
+      span {
+        &:hover {
+          color: rgb(107, 107, 107);
+        }
+      }
+    }
+  }
+}
+
+section.history {
+  padding: 50px 20px;
+  h2 {
+    text-align: center;
+    color: rgb(175, 175, 175);
+    padding: 20px 0px;
+  }
+
+  table#video-list {
+    color: whitesmoke;
+    padding: 20px;
+    width: 100%;
+
+    tr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      td {
+        padding: 0px 10px;
+        font-size: 16px;
+      }
+
+      td.videoName {
+        span.converted {
+          display: inline-block;
+          max-width: 500px;
+          white-space: nowrap;
+          //   color: green;
+          overflow: hidden !important;
+          text-overflow: ellipsis;
+        }
+      }
+
+      td.convertVideoTime {
+        span.convertedAt {
+          color: rgb(179, 146, 0);
+          //   font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .cleanHistoryBtn_container {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    padding: 10px 30px;
+    justify-content: flex-end;
+
+    span {
+      padding: 10px;
+      background-color: #4f008f;
+      border-radius: 5px;
+      z-index: 999;
+      font-size: 16px;
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.1);
+        background-color: #470081;
+      }
+    }
+  }
+}

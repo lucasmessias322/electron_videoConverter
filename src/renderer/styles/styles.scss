@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   color: rgb(175, 175, 175);
+  text-decoration: none;
 }
 
 body {
@@ -15,6 +16,7 @@ header {
   background-color: #252525;
   top: 0;
   width: 100%;
+
   div.menu {
     display: flex;
     align-items: center;

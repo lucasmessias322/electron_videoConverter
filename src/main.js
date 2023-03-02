@@ -21,6 +21,7 @@ function createWindow() {
     maximizable: false,
     fullscreen: false,
     resizable: false,
+    title: "Conversor de video",
   });
 
   if (isDev) mainWindow.webContents.openDevTools();

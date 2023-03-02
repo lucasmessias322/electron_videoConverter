@@ -12,7 +12,7 @@ const progressVideo = document.querySelector("#progress-video");
 const videosForConverteContainer = document.querySelector(
   "#videos_for_converte_Container"
 );
-const videoList = document.querySelector("#video-list");
+
 
 let videoHistory = [];
 if (localStorage.getItem("videoHistory")) {

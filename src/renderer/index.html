@@ -2,20 +2,31 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Electron FFmpeg Converter</title>
+    <title>Converter Videos</title>
     <link rel="stylesheet" href="./styles/styles.css" />
+    <script
+      src="https://kit.fontawesome.com/2e576afcbf.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
     <header>
       <div class="menu">
-        <div class="menu_item"><span>Historico</span></div>
+        <div class="menu">
+          <div class="menu_item">
+            <a href="./index.html"><span>Conversor de videos</span></a>
+          </div>
+          <div class="menu_item">
+            <a href="./history.html"><span>Historico</span></a>
+          </div>
+        </div>
       </div>
       <div class="conversor_functions">
         <form>
           <div>
             <label id="labelForinput-file" class="form_item" for="input-file"
-              >+ Adicionar videos...</label
+              ><i class="fa-solid fa-plus"></i> Adicionar videos...</label
             >
             <input class="form_item" type="file" id="input-file" multiple />
 
@@ -27,7 +38,9 @@
             </select>
           </div>
 
-          <button id="convert-button" class="form_item">Converter</button>
+          <button id="convert-button" class="form_item">
+            <i class="fa-solid fa-rotate-right"></i> Converter
+          </button>
         </form>
       </div>
     </header>
