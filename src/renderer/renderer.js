@@ -19,17 +19,17 @@ if (localStorage.getItem("videoHistory")) {
   videoHistory = JSON.parse(localStorage.getItem("videoHistory"));
 }
 
-for (let i = 0; i < videoHistory.length; i++) {
-  const { name, convertedAt } = videoHistory[i];
-  const item = `
-   <tr>
-    <td class="videoName">
-    <span class="converted">${name}</span> </td>
-    <td class="convertVideoTime">
-    <span class="convertedAt">${convertedAt}</span></td>
-   </tr>`;
-  videoList.innerHTML += item;
-}
+// for (let i = 0; i < videoHistory.length; i++) {
+//   const { name, convertedAt } = videoHistory[i];
+//   const item = `
+//    <tr>
+//     <td class="videoName">
+//     <span class="converted">${name}</span> </td>
+//     <td class="convertVideoTime">
+//     <span class="convertedAt">${convertedAt}</span></td>
+//    </tr>`;
+//   videoList.innerHTML += item;
+// }
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 inputField.addEventListener("change", () => {
@@ -44,22 +44,20 @@ inputField.addEventListener("change", () => {
   }
 });
 
-function addVideoToList(video) {
+// function addVideoToList({ videoName, saveOnHistory = false }) {
+//   const item = `
+//    <tr>
+//     <td class="videoName">
+//       <span class="converted">${videoName}</span>
+//     </td>
+//     <td class="convertVideoTime">
+//     <span class="convertedAt">${now}</span></td>
+//    </tr>`;
+
+// }
+function addVideosConvertedOnHistory(videoName) {
   const now = new Date().toLocaleString();
-
-  const item = `
-   <tr>
-    <td class="videoName">
-      <span class="converted">${video}</span>
-    </td>
-    <td class="convertVideoTime">
-    <span class="convertedAt">${now}</span></td>
-   </tr>`;
-
-  videoList.innerHTML += item;
-
-  videoHistory.push({ name: video, convertedAt: now });
-
+  videoHistory.push({ name: videoName, convertedAt: now });
   localStorage.setItem("videoHistory", JSON.stringify(videoHistory));
 }
 
@@ -109,9 +107,9 @@ function convert(videoName, inputFile, outputFile, destination) {
         fs.copyFile(outputPath, outputFile, (err) => {
           if (err) {
             reject(err);
+            console.log(err);
           } else {
-            addVideoToList(videoName);
-
+            addVideosConvertedOnHistory(videoName);
             resolve();
           }
         });

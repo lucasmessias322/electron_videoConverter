@@ -7,39 +7,43 @@
   </head>
 
   <body>
-    <section class="left_side">
-      <div class="container">
+    <header>
+      <div class="menu">
+        <div class="menu_item"><span>Historico</span></div>
+      </div>
+      <div class="conversor_functions">
         <form>
-          <div class="convertBtn_Container">
-            <button id="convert-button">Converter agora</button>
-          </div>
+          <div>
+            <label id="labelForinput-file" class="form_item" for="input-file"
+              >+ Adicionar videos...</label
+            >
+            <input class="form_item" type="file" id="input-file" multiple />
 
-          <label for="input-file">Escolha um ou mais videos:</label>
-          <input type="file" id="input-file" multiple required />
-          <div id="videos_for_converte_Container"></div>
-          <br />
-          <div class="container_output-format">
-            <label for="output-format">Formato de video desejado:</label>
+            <!-- <label for="output-format">Formato de video desejado:</label> -->
             <select id="output-format">
-              <option value="mp4">MP4</option>
-              <option value="avi">AVI</option>
-              <option value="mov">MOV</option>
+              <option value="mp4"><span>Converter para MP4</span></option>
+              <option value="avi"><span>Converter para AVI</span></option>
+              <option value="mov"><span>Converter para MOV</span></option>
             </select>
           </div>
+
+          <button id="convert-button" class="form_item">Converter</button>
         </form>
-
-        <div class="progress-bar_container">
-          <p id="progress-video"></p>
-          <progress id="progress-bar" value="0" max="100"></progress>
-          <p id="progress-text">0%</p>
-        </div>
       </div>
-    </section>
+    </header>
 
-    <section class="right_side">
+    <div id="videos_for_converte_Container"></div>
+
+    <div class="progress-bar_container">
+      <p id="progress-video"></p>
+      <progress id="progress-bar" value="0" max="100"></progress>
+      <p id="progress-text">0%</p>
+    </div>
+
+    <!-- <section class="right_side">
       <h2>Historico de conversão</h2>
       <table id="video-list" border="0"></table>
-    </section>
+    </section> -->
 
     <script src="./renderer.js"></script>
   </body>
