@@ -13,23 +13,10 @@ const videosForConverteContainer = document.querySelector(
   "#videos_for_converte_Container"
 );
 
-
 let videoHistory = [];
 if (localStorage.getItem("videoHistory")) {
   videoHistory = JSON.parse(localStorage.getItem("videoHistory"));
 }
-
-// for (let i = 0; i < videoHistory.length; i++) {
-//   const { name, convertedAt } = videoHistory[i];
-//   const item = `
-//    <tr>
-//     <td class="videoName">
-//     <span class="converted">${name}</span> </td>
-//     <td class="convertVideoTime">
-//     <span class="convertedAt">${convertedAt}</span></td>
-//    </tr>`;
-//   videoList.innerHTML += item;
-// }
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 inputField.addEventListener("change", () => {
@@ -44,17 +31,6 @@ inputField.addEventListener("change", () => {
   }
 });
 
-// function addVideoToList({ videoName, saveOnHistory = false }) {
-//   const item = `
-//    <tr>
-//     <td class="videoName">
-//       <span class="converted">${videoName}</span>
-//     </td>
-//     <td class="convertVideoTime">
-//     <span class="convertedAt">${now}</span></td>
-//    </tr>`;
-
-// }
 function addVideosConvertedOnHistory(videoName) {
   const now = new Date().toLocaleString();
   videoHistory.push({ name: videoName, convertedAt: now });
@@ -76,48 +52,50 @@ form.addEventListener("submit", async (event) => {
     const outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
 
-    await convert(currentVideo, input, outputPath, destination);
+    try {
+      await ipcRenderer.invoke(
+        "convert-video",
+        currentVideo,
+        input,
+        outputPath,
+        destination
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   progressVideo.innerText = "";
 });
 
-function convert(videoName, inputFile, outputFile, destination) {
-  return new Promise((resolve, reject) => {
-    const outputPath = path.join(destination, path.basename(outputFile));
-    const fileConvertedSpanTag = document.getElementById(videoName);
+ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
+  const spanTag = document.getElementById(videoName);
+  if (spanTag) {
+    if (progress === 100) {
+      spanTag.classList.remove("converting");
+      spanTag.classList.add("converted");
+    } else {
+      spanTag.classList.add("converting");
+    }
+  }
+  progressBar.style.display = "block";
+  progressText.style.display = "block";
+  progressVideo.innerText = `Converting: ${videoName}`;
+  progressBar.value = progress;
+  progressText.innerText = `${progress}%`;
+});
 
-    const command = ffmpeg(inputFile)
-      .output(outputPath)
-      .on("progress", (progress) => {
-        progressBar.style.display = "block";
-        progressText.style.display = "block";
-        progressBar.value = progress.percent;
-        progressText.innerText = `${Math.round(progress.percent)}%`;
-        progressVideo.innerText = `Converting: ${videoName}`;
-        fileConvertedSpanTag.classList.add("converting");
-      })
-      .on("end", () => {
-        progressBar.style.display = "none";
-        progressText.style.display = "none";
-        progressVideo.innerText = "";
-        fileConvertedSpanTag.classList.remove("converting");
-        fileConvertedSpanTag.classList.add("converted");
+ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
+  const fileConvertedSpanTag = document.getElementById(videoName);
+  progressBar.style.display = "none";
+  progressText.style.display = "none";
+  progressVideo.innerText = "";
+  fileConvertedSpanTag.classList.remove("converting");
+  fileConvertedSpanTag.classList.add("converted");
 
-        fs.copyFile(outputPath, outputFile, (err) => {
-          if (err) {
-            reject(err);
-            console.log(err);
-          } else {
-            addVideosConvertedOnHistory(videoName);
-            resolve();
-          }
-        });
-      })
-      .on("error", (error) => {
-        reject(error);
-      });
+  addVideosConvertedOnHistory(videoName);
+});
 
-    command.run();
-  });
-}
+ipcRenderer.on("conversion-error", (event, videoName, error) => {
+  window.alert(`Erro ao converter: ${videoName} erro: ${error}`);
+});

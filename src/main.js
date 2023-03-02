@@ -4,6 +4,8 @@ const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
+// const videoConversor = require("./videoConversor");
+
 const isDev = process.env.NODE_ENV !== "production";
 let mainWindow;
 let conversionQueue = [];
@@ -73,45 +75,46 @@ ipcMain.handle("select-directory", async (event) => {
   return result.filePaths[0];
 });
 
-ipcMain.on("convert-video", (event, arg) => {
-  conversionQueue.push(arg);
-  if (conversionQueue.length === 1) {
-    convertNextVideo(event.sender);
+ipcMain.handle(
+  "convert-video",
+  async (event, videoName, inputFile, outputFile, destination) => {
+    await convertVideo(videoName, inputFile, outputFile, destination);
   }
-});
+);
 
-function convertNextVideo(sender) {
-  if (conversionQueue.length === 0) {
-    sender.send("conversion-queue-finished");
-    return;
-  }
+function convertVideo(videoName, inputFile, outputFile, destination) {
+  return new Promise((resolve, reject) => {
+    const outputPath = path.join(destination, path.basename(outputFile));
 
-  const { input, output, destination } = conversionQueue[0];
-  const outputPath = path.join(destination, path.basename(output));
+    const command = ffmpeg(inputFile)
+      .output(outputPath)
+      .on("progress", (progress) => {
+        mainWindow.webContents.send(
+          "conversion-progress",
+          videoName,
+          Math.round(progress.percent)
+        );
+      })
+      .on("end", () => {
+        fs.copyFile(outputPath, outputFile, (err) => {
+          if (err) {
+            reject(err);
+            console.log(err);
+          } else {
+            mainWindow.webContents.send(
+              "conversion-complete",
+              videoName,
+              outputPath
+            );
+            resolve();
+          }
+        });
+      })
+      .on("error", (error) => {
+        reject(error);
+        mainWindow.webContents.send("conversion-error", videoName, error);
+      });
 
-  ffmpeg(input)
-    .output(outputPath)
-    .on("progress", (progress) => {
-      sender.send("conversion-progress", {
-        progress: progress.percent,
-        input: input,
-      });
-    })
-    .on("end", () => {
-      sender.send("video-converted", {
-        message: "Conversão concluída com sucesso!",
-        input: input,
-      });
-      conversionQueue.shift();
-      convertNextVideo(sender);
-    })
-    .on("error", (err) => {
-      sender.send("video-convert-error", {
-        error: err.message,
-        input: input,
-      });
-      conversionQueue.shift();
-      convertNextVideo(sender);
-    })
-    .run();
+    command.run();
+  });
 }
