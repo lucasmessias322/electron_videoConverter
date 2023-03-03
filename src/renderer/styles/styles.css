@@ -29,6 +29,9 @@ header div.menu .menu_item {
 header div.menu .menu_item span:hover {
   color: rgb(107, 107, 107);
 }
+header div.menu .menu_item span.currentPage {
+  color: rgb(107, 107, 107);
+}
 header div.conversor_functions {
   padding: 20px;
   border-bottom: 0.5px solid rgb(51, 51, 51);
@@ -75,7 +78,7 @@ header div.conversor_functions form #output-format {
   outline: none;
 }
 
-.progress-bar_container {
+section#videoConversor_container .progress-bar_container {
   background-color: #252525;
   display: flex;
   flex-direction: column;
@@ -84,33 +87,32 @@ header div.conversor_functions form #output-format {
   position: fixed;
   padding: 20px;
   bottom: 0;
-  z-index: 99999999;
+  z-index: 99;
 }
-.progress-bar_container progress {
+section#videoConversor_container .progress-bar_container progress {
   width: 100%;
   height: 2px;
   border-radius: 0px;
 }
-.progress-bar_container progress::-webkit-progress-bar {
+section#videoConversor_container .progress-bar_container progress::-webkit-progress-bar {
   background-color: #3a3a3a;
   border-radius: 0px;
 }
-.progress-bar_container progress::-webkit-progress-value {
+section#videoConversor_container .progress-bar_container progress::-webkit-progress-value {
   background-color: #4f008f;
   border-radius: 0px;
 }
-.progress-bar_container #progress-video {
+section#videoConversor_container .progress-bar_container #progress-video {
   font-size: 10px;
   padding-bottom: 10px;
 }
-.progress-bar_container #progress-text {
+section#videoConversor_container .progress-bar_container #progress-text {
   width: 100%;
   text-align: center;
   padding-top: 20px;
   font-size: 14px;
 }
-
-#videos_for_converte_Container {
+section#videoConversor_container #videos_for_converte_Container {
   height: 100vh;
   overflow: auto;
   width: 100%;
@@ -119,7 +121,7 @@ header div.conversor_functions form #output-format {
   display: flex;
   flex-direction: column;
 }
-#videos_for_converte_Container div {
+section#videoConversor_container #videos_for_converte_Container div {
   background-color: #252525;
   margin-bottom: 5px;
   display: flex;
@@ -127,23 +129,90 @@ header div.conversor_functions form #output-format {
   border-radius: 5px;
   padding: 20px;
 }
-#videos_for_converte_Container div span {
+section#videoConversor_container #videos_for_converte_Container div span {
   font-size: 16px;
   padding: 2px 0px;
 }
-#videos_for_converte_Container div.converting {
+section#videoConversor_container #videos_for_converte_Container div.converting {
   background-color: #43009b;
 }
-#videos_for_converte_Container div.converted {
+section#videoConversor_container #videos_for_converte_Container div.converted {
   background-color: #1a1a1a;
 }
-#videos_for_converte_Container::-webkit-scrollbar-track {
+section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar-track {
   background-color: rgba(244, 244, 244, 0);
 }
-#videos_for_converte_Container::-webkit-scrollbar {
+section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar {
   width: 5px;
   background: rgba(244, 244, 244, 0);
 }
-#videos_for_converte_Container::-webkit-scrollbar-thumb {
+section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar-thumb {
   background: #4f008f;
+}
+
+section.historico_container {
+  width: 100%;
+  height: 100%;
+  background-color: #252525;
+  position: fixed;
+  overflow: auto;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+  z-index: 9999999;
+}
+section.historico_container section.history {
+  width: 100%;
+  height: 100%;
+  padding-top: 50px;
+  background-color: #252525;
+}
+section.historico_container section.history h2 {
+  text-align: center;
+  color: rgb(175, 175, 175);
+  padding: 20px 0px;
+}
+section.historico_container section.history table#video-list {
+  color: whitesmoke;
+  padding: 20px;
+  width: 100%;
+}
+section.historico_container section.history table#video-list tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+section.historico_container section.history table#video-list tr td {
+  padding: 0px 10px;
+  font-size: 16px;
+}
+section.historico_container section.history table#video-list tr td.videoName span.converted {
+  display: inline-block;
+  max-width: 500px;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+section.historico_container section.history table#video-list tr td.convertVideoTime span.convertedAt {
+  color: rgb(179, 146, 0);
+}
+section.historico_container section.history .cleanHistoryBtn_container {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  padding: 50px 20px;
+}
+section.historico_container section.history .cleanHistoryBtn_container span {
+  padding: 10px;
+  background-color: #4f008f;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+section.historico_container section.history .cleanHistoryBtn_container span:hover {
+  transform: scale(1.1);
+  background-color: #470081;
 }/*# sourceMappingURL=styles.css.map */

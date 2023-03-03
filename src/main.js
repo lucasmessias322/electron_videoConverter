@@ -14,15 +14,17 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 600,
+    minHeight: 600,
+    minWidth: 1024,
 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       preload: path.join(__dirname, "preload.js"),
     },
-    maximizable: false,
+    maximizable: true,
     fullscreen: false,
-    resizable: false,
+    resizable: true,
     title: "Conversor de video",
   });
 
@@ -82,6 +84,10 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
+  await getVideoInformation(videoName, videoPath);
+});
+
 function convertVideo(videoName, inputFile, outputFile, destination) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(destination, path.basename(outputFile));
@@ -118,10 +124,6 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
     command.run();
   });
 }
-
-ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
-  await getVideoInformation(videoName, videoPath);
-});
 
 async function getVideoInformation(videoName, videoPath) {
   return new Promise((resolve, reject) => {

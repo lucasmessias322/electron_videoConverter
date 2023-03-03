@@ -1,7 +1,5 @@
 const { ipcRenderer } = require("electron");
-const ffmpeg = require("fluent-ffmpeg");
 const path = require("path");
-const fs = require("fs");
 
 const form = document.querySelector("form");
 const inputField = document.querySelector("#input-file");
@@ -12,14 +10,20 @@ const progressVideo = document.querySelector("#progress-video");
 const videosForConverteContainer = document.querySelector(
   "#videos_for_converte_Container"
 );
+const clearHistoryBtn = document.querySelector("#clearHistoryBtn");
+const videoList = document.querySelector("#video-list");
 
 let videoHistory = [];
+//Passa a lista de video contida no localstorage para a variavel videoHistory
 if (localStorage.getItem("videoHistory")) {
   videoHistory = JSON.parse(localStorage.getItem("videoHistory"));
 }
-async function getVideoInformation(videoName, videoPath) {
-  return await ipcRenderer.invoke("getVideo_information", videoName, videoPath);
-}
+LoadHistory();
+
+clearHistoryBtn.addEventListener("click", () => {
+  localStorage.removeItem("videoHistory");
+  videoList.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+});
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 inputField.addEventListener("change", async () => {
   const inputFiles = inputField.files;
@@ -46,12 +50,6 @@ inputField.addEventListener("change", async () => {
     }
   }
 });
-
-function addVideosConvertedOnHistory(videoName) {
-  const now = new Date().toLocaleString();
-  videoHistory.push({ name: videoName, convertedAt: now });
-  localStorage.setItem("videoHistory", JSON.stringify(videoHistory));
-}
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -117,10 +115,37 @@ ipcRenderer.on("conversion-error", (event, videoName, error) => {
 
 // retorna as infomaçoes dos videos
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
-  console.log(videoInfo);
   const videoduration = document.getElementById(`${videoName}_videoduration`);
 
   if (videoduration) {
     videoduration.innerHTML = `<b>Duração: </b>${videoInfo.duration}`;
   }
 });
+
+async function getVideoInformation(videoName, videoPath) {
+  return await ipcRenderer.invoke("getVideo_information", videoName, videoPath);
+}
+
+function addVideosConvertedOnHistory(videoName) {
+  const now = new Date().toLocaleString();
+  videoHistory.push({ name: videoName, convertedAt: now });
+  localStorage.setItem("videoHistory", JSON.stringify(videoHistory));
+}
+
+function LoadHistory() {
+  // Carregar o historico
+  if (videoHistory.length > 0) {
+    for (let i = 0; i < videoHistory.length; i++) {
+      const { name, convertedAt } = videoHistory[i];
+      const item = `<tr>
+                        <td class="videoName">
+                        <span class="converted">${name}</span> </td>
+                        <td class="convertVideoTime">
+                        <span class="convertedAt">${convertedAt}</span></td>
+                    </tr>`;
+      videoList.innerHTML += item;
+    }
+  } else {
+    videoList.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+  }
+}
