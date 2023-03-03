@@ -30,9 +30,15 @@
               <label id="labelForinput-file" class="form_item" for="input-file"
                 ><i class="fa-solid fa-plus"></i> Adicionar videos...</label
               >
-              <input class="form_item" type="file" id="input-file" multiple />
+              <input
+                class="form_item"
+                type="file"
+                name="input-file"
+                id="input-file"
+                multiple
+                required
+              />
 
-              <!-- <label for="output-format">Formato de video desejado:</label> -->
               <select id="output-format">
                 <option value="mp4"><span>Converter para MP4</span></option>
                 <option value="avi"><span>Converter para AVI</span></option>
@@ -40,9 +46,11 @@
               </select>
             </div>
 
-            <button id="convert-button" class="form_item">
-              <i class="fa-solid fa-rotate-right"></i> Converter
-            </button>
+            <div>
+              <button id="convert-button" class="form_item">
+                <i class="fa-solid fa-rotate-right"></i> Converter
+              </button>
+            </div>
           </form>
         </div>
       </header>

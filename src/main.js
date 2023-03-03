@@ -4,11 +4,8 @@ const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
-// const videoConversor = require("./videoConversor");
-
 const isDev = process.env.NODE_ENV !== "production";
 let mainWindow;
-let conversionQueue = [];
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -20,7 +17,6 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      preload: path.join(__dirname, "preload.js"),
     },
     maximizable: true,
     fullscreen: false,
@@ -28,7 +24,9 @@ function createWindow() {
     title: "Conversor de video",
   });
 
-  if (isDev) mainWindow.webContents.openDevTools();
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
 
   mainWindow.loadURL(
     url.format({
@@ -105,7 +103,7 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
         fs.copyFile(outputPath, outputFile, (err) => {
           if (err) {
             reject(err);
-            console.log(err);
+            dialog.showErrorBox(`Erro ao converter ${videoName}`, err);
           } else {
             mainWindow.webContents.send(
               "conversion-complete",
@@ -118,6 +116,7 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
       })
       .on("error", (error) => {
         reject(error);
+        dialog.showErrorBox(`Erro ao converter video(os)`, videoName);
         mainWindow.webContents.send("conversion-error", videoName, error);
       });
 
@@ -130,6 +129,9 @@ async function getVideoInformation(videoName, videoPath) {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
         reject(err);
+        dialog.showErrorBox(`Seu video pode está corrompido!`, videoName);
+        mainWindow.webContents.send("video-comrropido", videoName, err);
+
         return;
       }
 

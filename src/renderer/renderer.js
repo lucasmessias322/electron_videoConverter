@@ -122,6 +122,11 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
   }
 });
 
+ipcRenderer.on("video-comrropido", (event, videoName, err) => {
+  inputField.value = "";
+  videosForConverteContainer.innerHTML = "";
+});
+
 async function getVideoInformation(videoName, videoPath) {
   return await ipcRenderer.invoke("getVideo_information", videoName, videoPath);
 }

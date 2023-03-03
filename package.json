@@ -5,15 +5,42 @@
   "main": "./src/main.js",
   "scripts": {
     "dev": "npx electronmon .",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
-  "author": "",
+  "author": "lucasmessias322",
   "license": "ISC",
   "devDependencies": {
+    "electron-builder": "^23.6.0",
     "electron": "^23.1.1"
   },
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2"
+  },
+  "build": {
+    "productName": "Conversor de videos",
+    "win": {
+      "icon": "icons/icon.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "src/main.js",
+      "src/renderer/renderer.js",
+      "src/renderer/index.html",
+      "src/renderer/styles/styles.css"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/sqlite3",
+        "to": "app/node_modules/sqlite3"
+      }
+    ],
+    "electronVersion": "15.0.0"
   }
 }
