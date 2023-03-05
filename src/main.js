@@ -7,6 +7,20 @@ const fs = require("fs");
 const isDev = process.env.NODE_ENV !== "production";
 let mainWindow;
 
+//Get the paths to the packaged versions of the binaries we want to use
+const ffmpegPath = require("ffmpeg-static").replace(
+  "app.asar",
+  "app.asar.unpacked"
+);
+const ffprobePath = require("ffprobe-static").path.replace(
+  "app.asar",
+  "app.asar.unpacked"
+);
+
+//tell the ffmpeg package where it can find the needed binaries.
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1024,

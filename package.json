@@ -10,12 +10,14 @@
   },
   "keywords": [],
   "author": "lucasmessias322",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "electron-builder": "^23.6.0",
-    "electron": "^23.1.1"
+    "electron": "^23.1.1",
+    "electron-builder": "^23.6.0"
   },
   "dependencies": {
+    "ffmpeg-static": "^5.1.0",
+    "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2"
   },
   "build": {
@@ -23,9 +25,16 @@
     "win": {
       "icon": "icons/icon.ico",
       "target": [
-        "nsis",
-        "zip"
+        "nsis"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Meu aplicativo"
     },
     "files": [
       "dist/**/*",
@@ -35,11 +44,10 @@
       "src/renderer/index.html",
       "src/renderer/styles/styles.css"
     ],
-    "extraResources": [
-      {
-        "from": "node_modules/sqlite3",
-        "to": "app/node_modules/sqlite3"
-      }
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/bin/${os}/${arch}/ffmpeg",
+      "node_modules/ffmpeg-static/index.js",
+      "node_modules/ffmpeg-static/package.json"
     ],
     "electronVersion": "15.0.0"
   }
