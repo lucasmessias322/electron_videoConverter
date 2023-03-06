@@ -5,6 +5,16 @@
   color: rgb(175, 175, 175);
   text-decoration: none;
 }
+*::-webkit-scrollbar-track {
+  background-color: rgba(244, 244, 244, 0);
+}
+*::-webkit-scrollbar {
+  width: 5px;
+  background: rgba(244, 244, 244, 0);
+}
+*::-webkit-scrollbar-thumb {
+  background: #4f008f;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -117,7 +127,7 @@ section#videoConversor_container #videos_for_converte_Container {
   overflow: auto;
   width: 100%;
   background-color: #181818;
-  padding: 180px 20px;
+  padding: 180px 10px;
   display: flex;
   flex-direction: column;
 }
@@ -126,16 +136,10 @@ section#videoConversor_container #videos_for_converte_Container div {
   margin-bottom: 5px;
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
   padding: 20px;
-}
-section#videoConversor_container #videos_for_converte_Container div span {
-  font-size: 16px;
-  padding: 2px 0px;
 }
 section#videoConversor_container #videos_for_converte_Container div div.video_source {
   background-color: #2e2e2e;
-  padding: 20px;
   width: 50%;
   margin-top: 10px;
 }
@@ -145,7 +149,7 @@ section#videoConversor_container #videos_for_converte_Container div div.video_so
   flex-direction: row;
 }
 section#videoConversor_container #videos_for_converte_Container div div.video_source ul li {
-  margin: 10px;
+  margin: 5px 10px;
 }
 section#videoConversor_container #videos_for_converte_Container div div.video_source ul li span {
   font-size: 14px;
@@ -158,16 +162,6 @@ section#videoConversor_container #videos_for_converte_Container div.converting d
 }
 section#videoConversor_container #videos_for_converte_Container div.converted {
   background-color: #1a1a1a;
-}
-section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar-track {
-  background-color: rgba(244, 244, 244, 0);
-}
-section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar {
-  width: 5px;
-  background: rgba(244, 244, 244, 0);
-}
-section#videoConversor_container #videos_for_converte_Container::-webkit-scrollbar-thumb {
-  background: #4f008f;
 }
 
 section.historico_container {

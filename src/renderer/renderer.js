@@ -74,6 +74,8 @@ form.addEventListener("submit", async (event) => {
   progressVideo.innerText = "";
 });
 
+ipcRenderer.on("conversion-started", (event, videoName) => {});
+
 ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
   const spanTag = document.getElementById(videoName);
   if (spanTag) {
@@ -113,7 +115,6 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
         <b>Nome do video: </b>${videoName}
       </span>
       <div class="video_source">
-        <h3>Source</h3>
         <ul>
           <li>
           <span class="icon"><i class="fa-solid fa-film"></i> </span>
@@ -142,6 +143,7 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
           </li>
         </ul>
       </div>
+      
     </div>`;
 
   videosForConverteContainer.innerHTML += item;

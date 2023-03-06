@@ -23,9 +23,9 @@ ffmpeg.setFfprobePath(ffprobePath);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 600,
-    minHeight: 600,
+    width: 1150,
+    height: 700,
+    minHeight: 700,
     minWidth: 1024,
 
     webPreferences: {
@@ -106,6 +106,16 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
 
     const command = ffmpeg(inputFile)
       .output(outputPath)
+      .outputOptions("-c:v", "libx264")
+      .outputOptions("-c:a", "aac")
+      .outputOptions("-strict", "-2")
+      .outputOptions("-movflags", "faststart")
+      .outputOptions("-threads", "2")
+      .outputOptions("-crf", "22")
+      .outputOptions("-preset", "fast")
+      .on("start", () => {
+        mainWindow.webContents.send("conversion-started", videoName);
+      })
       .on("progress", (progress) => {
         mainWindow.webContents.send(
           "conversion-progress",
@@ -154,8 +164,6 @@ async function getVideoInformation(videoName, videoPath) {
       const resolution = `${metadata.streams[0].width}x${metadata.streams[0].height}`;
       const size = metadata.format.size;
       const format = metadata.format.format_long_name;
-
-      console.log(metadata);
 
       resolve({
         duration,
