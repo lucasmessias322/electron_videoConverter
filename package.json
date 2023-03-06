@@ -21,7 +21,7 @@
     "fluent-ffmpeg": "^2.1.2"
   },
   "build": {
-    "productName": "Conversor de videos",
+    "productName": "Video Converter",
     "win": {
       "icon": "icons/icon.ico",
       "target": [
@@ -34,7 +34,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Meu aplicativo"
+      "shortcutName": "Video Converter"
     },
     "files": [
       "dist/**/*",

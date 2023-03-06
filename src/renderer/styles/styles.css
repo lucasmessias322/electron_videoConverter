@@ -133,8 +133,28 @@ section#videoConversor_container #videos_for_converte_Container div span {
   font-size: 16px;
   padding: 2px 0px;
 }
+section#videoConversor_container #videos_for_converte_Container div div.video_source {
+  background-color: #2e2e2e;
+  padding: 20px;
+  width: 50%;
+  margin-top: 10px;
+}
+section#videoConversor_container #videos_for_converte_Container div div.video_source ul {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+}
+section#videoConversor_container #videos_for_converte_Container div div.video_source ul li {
+  margin: 10px;
+}
+section#videoConversor_container #videos_for_converte_Container div div.video_source ul li span {
+  font-size: 14px;
+}
 section#videoConversor_container #videos_for_converte_Container div.converting {
   background-color: #43009b;
+}
+section#videoConversor_container #videos_for_converte_Container div.converting div.video_source {
+  background-color: #270158;
 }
 section#videoConversor_container #videos_for_converte_Container div.converted {
   background-color: #1a1a1a;

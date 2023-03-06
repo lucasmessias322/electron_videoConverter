@@ -32,7 +32,7 @@ header {
         }
       }
 
-      span.currentPage{
+      span.currentPage {
         color: rgb(107, 107, 107);
       }
     }
@@ -46,8 +46,6 @@ header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-
-      
 
       .form_item {
         margin: 5px;
@@ -152,15 +150,37 @@ section#videoConversor_container {
       display: flex;
       flex-direction: column;
       border-radius: 5px;
-
       padding: 20px;
+
       span {
         font-size: 16px;
         padding: 2px 0px;
       }
+
+      div.video_source {
+        background-color: #2e2e2e;
+        padding: 20px;
+        width: 50%;
+        margin-top: 10px;
+
+        ul {
+          list-style: none;
+          display: flex;
+          flex-direction: row;
+          li {
+            margin: 10px;
+            span {
+              font-size: 14px;
+            }
+          }
+        }
+      }
     }
     div.converting {
       background-color: #43009b;
+      div.video_source {
+        background-color: #270158;
+      }
     }
 
     div.converted {

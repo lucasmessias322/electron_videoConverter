@@ -30,21 +30,13 @@ inputField.addEventListener("change", async () => {
   videosForConverteContainer.innerHTML = "";
 
   for (let i = 0; i < inputFiles.length; i++) {
-    const item = `
-    <div id="${inputFiles[i].name}">
-      <span class="videoname" id="${inputFiles[i].name}_videoname">
-        <b>Nome do video: </b>${inputFiles[i].name}
-      </span>
-      <span class="videoduration" id="${inputFiles[i].name}_videoduration">
-       
-      </span>
-    </div>`;
-
-    videosForConverteContainer.innerHTML += item;
-
     try {
       // Pesquisa as infomaçoes dos videos
-      await getVideoInformation(inputFiles[i].name, inputFiles[i].path);
+      await ipcRenderer.invoke(
+        "getVideo_information",
+        inputFiles[i].name,
+        inputFiles[i].path
+      );
     } catch (error) {
       console.log(error);
     }
@@ -115,21 +107,50 @@ ipcRenderer.on("conversion-error", (event, videoName, error) => {
 
 // retorna as infomaçoes dos videos
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
-  const videoduration = document.getElementById(`${videoName}_videoduration`);
+  const item = `
+    <div id="${videoName}">
+      <span class="videoname" id="${videoName}_videoname">
+        <b>Nome do video: </b>${videoName}
+      </span>
+      <div class="video_source">
+        <h3>Source</h3>
+        <ul>
+          <li>
+          <span class="icon"><i class="fa-solid fa-film"></i> </span>
+          <span class="videoInfo" >
+             ${videoName.substring(videoName.length - 3)}
+          </span>
+          </li>
+          <li>
+            <span class="icon"><i class="fa-solid fa-minimize"></i> </span>
+            <span class="videoInfo" >
+              ${videoInfo.resolution}
+            </span>
+          </li>
+            
+          <li>
+          <span class="icon"><i class="fa-regular fa-clock"></i> </span>
+          <span class="videoInfo" >
+            ${formatVideoLength(videoInfo.duration)}
+          </span>
+          </li>
+          <li>
+            <span class="icon"><i class="fa-regular fa-folder"></i> </span>
+            <span class="videoInfo" >
+              ${formatSize(videoInfo.size)}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>`;
 
-  if (videoduration) {
-    videoduration.innerHTML = `<b>Duração: </b>${videoInfo.duration}`;
-  }
+  videosForConverteContainer.innerHTML += item;
 });
 
 ipcRenderer.on("video-comrropido", (event, videoName, err) => {
   inputField.value = "";
   videosForConverteContainer.innerHTML = "";
 });
-
-async function getVideoInformation(videoName, videoPath) {
-  return await ipcRenderer.invoke("getVideo_information", videoName, videoPath);
-}
 
 function addVideosConvertedOnHistory(videoName) {
   const now = new Date().toLocaleString();
@@ -153,4 +174,23 @@ function LoadHistory() {
   } else {
     videoList.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
+}
+
+function formatSize(size) {
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let i = 0;
+  while (size >= 1024 && i < units.length - 1) {
+    size /= 1024;
+    i++;
+  }
+  return `${size.toFixed(2)} ${units[i]}`;
+}
+
+function formatVideoLength(length) {
+  const hours = Math.floor(length / 3600);
+  const minutes = Math.floor((length - hours * 3600) / 60);
+  const seconds = length % 60;
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }

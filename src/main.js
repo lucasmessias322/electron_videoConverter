@@ -152,17 +152,25 @@ async function getVideoInformation(videoName, videoPath) {
       const duration = metadata.format.duration;
       const codecs = metadata.streams.map((stream) => stream.codec_name);
       const resolution = `${metadata.streams[0].width}x${metadata.streams[0].height}`;
+      const size = metadata.format.size;
+      const format = metadata.format.format_long_name;
+
+      console.log(metadata);
 
       resolve({
         duration,
         codecs,
         resolution,
+        format,
+        size,
       });
 
       mainWindow.webContents.send("videoInformation-ready", videoName, {
         duration,
         codecs,
         resolution,
+        format,
+        size,
       });
     });
   });
