@@ -7,11 +7,9 @@ const outputFormatField = document.querySelector("#output-format");
 const progressBar = document.querySelector("#progress-bar");
 const progressText = document.querySelector("#progress-text");
 const progressVideo = document.querySelector("#progress-video");
-const videosForConverteContainer = document.querySelector(
-  "#videos_for_converte_Container"
-);
+const convertingList = document.querySelector("#convertingList");
+const tablevideo_list = document.getElementById("video-list");
 const clearHistoryBtn = document.querySelector("#clearHistoryBtn");
-const videoList = document.querySelector("#video-list");
 
 let videoHistory = [];
 //Passa a lista de video contida no localstorage para a variavel videoHistory
@@ -22,12 +20,13 @@ LoadHistory();
 
 clearHistoryBtn.addEventListener("click", () => {
   localStorage.removeItem("videoHistory");
-  videoList.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+  tablevideo_list.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
 });
+
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 inputField.addEventListener("change", async () => {
   const inputFiles = inputField.files;
-  videosForConverteContainer.innerHTML = "";
+  convertingList.innerHTML = "";
 
   for (let i = 0; i < inputFiles.length; i++) {
     try {
@@ -99,7 +98,6 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
-
   addVideosConvertedOnHistory(videoName);
 });
 
@@ -110,7 +108,7 @@ ipcRenderer.on("conversion-error", (event, videoName, error) => {
 // retorna as infomaçoes dos videos
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
   const item = `
-    <div id="${videoName}">
+    <div id="${videoName}" class="videoItemList">
       <span class="videoname" id="${videoName}_videoname">
         <b>Nome do video: </b>${videoName}
       </span>
@@ -146,12 +144,12 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
       
     </div>`;
 
-  videosForConverteContainer.innerHTML += item;
+  convertingList.innerHTML += item;
 });
 
 ipcRenderer.on("video-comrropido", (event, videoName, err) => {
   inputField.value = "";
-  videosForConverteContainer.innerHTML = "";
+  convertingList.innerHTML = "";
 });
 
 function addVideosConvertedOnHistory(videoName) {
@@ -171,10 +169,10 @@ function LoadHistory() {
                         <td class="convertVideoTime">
                         <span class="convertedAt">${convertedAt}</span></td>
                     </tr>`;
-      videoList.innerHTML += item;
+      tablevideo_list.innerHTML += item;
     }
   } else {
-    videoList.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+    tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
 }
 

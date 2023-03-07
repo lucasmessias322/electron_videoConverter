@@ -6,11 +6,11 @@
   text-decoration: none;
 }
 *::-webkit-scrollbar-track {
-  background-color: rgba(244, 244, 244, 0);
+  background-color: transparent;
 }
 *::-webkit-scrollbar {
   width: 5px;
-  background: rgba(244, 244, 244, 0);
+  background: transparent;
 }
 *::-webkit-scrollbar-thumb {
   background: #4f008f;
@@ -27,37 +27,19 @@ header {
   top: 0;
   width: 100%;
 }
-header div.menu {
-  display: flex;
-  align-items: center;
-  border-bottom: 0.5px solid rgb(51, 51, 51);
-}
-header div.menu .menu_item {
-  padding: 10px;
-  cursor: pointer;
-}
-header div.menu .menu_item span:hover {
-  color: rgb(107, 107, 107);
-}
-header div.menu .menu_item span.currentPage {
-  color: rgb(107, 107, 107);
-}
-header div.conversor_functions {
-  padding: 20px;
-  border-bottom: 0.5px solid rgb(51, 51, 51);
-}
-header div.conversor_functions form {
+header form {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 20px;
 }
-header div.conversor_functions form .form_item {
+header form .form_item {
   margin: 5px;
 }
-header div.conversor_functions form #input-file {
+header form #input-file {
   display: none;
 }
-header div.conversor_functions form label#labelForinput-file {
+header form label#labelForinput-file {
   background-color: #4f008f;
   padding: 15px 20px;
   border-radius: 5px;
@@ -65,10 +47,10 @@ header div.conversor_functions form label#labelForinput-file {
   font-size: 16px;
   cursor: pointer;
 }
-header div.conversor_functions form label#labelForinput-file:hover {
+header form label#labelForinput-file:hover {
   background-color: #380066;
 }
-header div.conversor_functions form button#convert-button {
+header form button#convert-button {
   background-color: #4f008f;
   outline: none;
   padding: 15px 20px;
@@ -77,19 +59,134 @@ header div.conversor_functions form button#convert-button {
   border: none;
   font-size: 16px;
 }
-header div.conversor_functions form button#convert-button:hover {
+header form button#convert-button:hover {
   background-color: #380066;
 }
-header div.conversor_functions form #output-format {
+header form #output-format {
   padding: 10px;
   background-color: #252525;
   border: none;
   font-size: 16px;
   outline: none;
 }
+header div.bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid rgb(51, 51, 51);
+}
+header div.bar span {
+  background-color: #1a1a1a;
+  padding: 10px 20px;
+}
+header div.bar span.currenteVideoList {
+  background-color: #4f008f;
+}
 
-section#videoConversor_container .progress-bar_container {
+#videos_for_converte_Container {
+  height: 100vh;
+  width: 100%;
+  background-color: #181818;
+  padding-top: 155px;
+  padding-bottom: 100px;
+}
+#videos_for_converte_Container #convertedList {
+  overflow: auto;
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+#videos_for_converte_Container #convertedList h2 {
+  text-align: center;
+  color: rgb(175, 175, 175);
+  padding: 20px 0px;
+}
+#videos_for_converte_Container #convertedList table#video-list {
+  color: whitesmoke;
+  padding: 20px;
+  width: 100%;
+}
+#videos_for_converte_Container #convertedList table#video-list tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#videos_for_converte_Container #convertedList table#video-list tr td {
+  padding: 0px 10px;
+  font-size: 14px;
+}
+#videos_for_converte_Container #convertedList table#video-list tr td.videoName span.converted {
+  display: inline-block;
+  max-width: 500px;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+#videos_for_converte_Container #convertedList table#video-list tr td.convertVideoTime span.convertedAt {
+  color: rgb(179, 146, 0);
+}
+#videos_for_converte_Container #convertedList .cleanHistoryBtn_container {
+  position: fixed;
+  top: 0;
+  display: flex;
+  padding: 150px 0px;
+  z-index: 999999;
+  justify-content: flex-end;
+}
+#videos_for_converte_Container #convertedList .cleanHistoryBtn_container span {
+  padding: 10px 5px;
+  padding-right: 15px;
+  background-color: #4f008f;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+#videos_for_converte_Container #convertedList .cleanHistoryBtn_container span:hover {
+  padding-right: 30px;
+  background-color: #470081;
+}
+#videos_for_converte_Container #convertingList {
+  overflow: auto;
+  display: block;
+}
+#videos_for_converte_Container #convertingList div.videoItemList {
   background-color: #252525;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+#videos_for_converte_Container #convertingList div.videoItemList div.video_source {
+  background-color: #2e2e2e;
+  width: 50%;
+  margin-top: 10px;
+}
+#videos_for_converte_Container #convertingList div.videoItemList div.video_source ul {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+}
+#videos_for_converte_Container #convertingList div.videoItemList div.video_source ul li {
+  margin: 5px 10px;
+}
+#videos_for_converte_Container #convertingList div.videoItemList div.video_source ul li span {
+  font-size: 14px;
+}
+#videos_for_converte_Container #convertingList div.converting {
+  background-color: #270158;
+}
+#videos_for_converte_Container #convertingList div.converting div.video_source {
+  background-color: #43009b;
+}
+#videos_for_converte_Container #convertingList div.converted {
+  background-color: #1a1a1a;
+}
+
+.progress-bar_container {
+  background-color: #252525;
+  box-shadow: 10px 10px 10px 10px #181818;
   display: flex;
   flex-direction: column;
   border-top: 0.5px solid rgb(51, 51, 51);
@@ -99,134 +196,26 @@ section#videoConversor_container .progress-bar_container {
   bottom: 0;
   z-index: 99;
 }
-section#videoConversor_container .progress-bar_container progress {
+.progress-bar_container progress {
   width: 100%;
   height: 2px;
   border-radius: 0px;
 }
-section#videoConversor_container .progress-bar_container progress::-webkit-progress-bar {
+.progress-bar_container progress::-webkit-progress-bar {
   background-color: #3a3a3a;
   border-radius: 0px;
 }
-section#videoConversor_container .progress-bar_container progress::-webkit-progress-value {
+.progress-bar_container progress::-webkit-progress-value {
   background-color: #4f008f;
   border-radius: 0px;
 }
-section#videoConversor_container .progress-bar_container #progress-video {
+.progress-bar_container #progress-video {
   font-size: 10px;
   padding-bottom: 10px;
 }
-section#videoConversor_container .progress-bar_container #progress-text {
+.progress-bar_container #progress-text {
   width: 100%;
   text-align: center;
   padding-top: 20px;
   font-size: 14px;
-}
-section#videoConversor_container #videos_for_converte_Container {
-  height: 100vh;
-  overflow: auto;
-  width: 100%;
-  background-color: #181818;
-  padding: 180px 10px;
-  display: flex;
-  flex-direction: column;
-}
-section#videoConversor_container #videos_for_converte_Container div {
-  background-color: #252525;
-  margin-bottom: 5px;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-section#videoConversor_container #videos_for_converte_Container div div.video_source {
-  background-color: #2e2e2e;
-  width: 50%;
-  margin-top: 10px;
-}
-section#videoConversor_container #videos_for_converte_Container div div.video_source ul {
-  list-style: none;
-  display: flex;
-  flex-direction: row;
-}
-section#videoConversor_container #videos_for_converte_Container div div.video_source ul li {
-  margin: 5px 10px;
-}
-section#videoConversor_container #videos_for_converte_Container div div.video_source ul li span {
-  font-size: 14px;
-}
-section#videoConversor_container #videos_for_converte_Container div.converting {
-  background-color: #43009b;
-}
-section#videoConversor_container #videos_for_converte_Container div.converting div.video_source {
-  background-color: #270158;
-}
-section#videoConversor_container #videos_for_converte_Container div.converted {
-  background-color: #1a1a1a;
-}
-
-section.historico_container {
-  width: 100%;
-  height: 100%;
-  background-color: #252525;
-  position: fixed;
-  overflow: auto;
-  top: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  display: none;
-  z-index: 9999999;
-}
-section.historico_container section.history {
-  width: 100%;
-  height: 100%;
-  padding-top: 50px;
-  background-color: #252525;
-}
-section.historico_container section.history h2 {
-  text-align: center;
-  color: rgb(175, 175, 175);
-  padding: 20px 0px;
-}
-section.historico_container section.history table#video-list {
-  color: whitesmoke;
-  padding: 20px;
-  width: 100%;
-}
-section.historico_container section.history table#video-list tr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-section.historico_container section.history table#video-list tr td {
-  padding: 0px 10px;
-  font-size: 16px;
-}
-section.historico_container section.history table#video-list tr td.videoName span.converted {
-  display: inline-block;
-  max-width: 500px;
-  white-space: nowrap;
-  overflow: hidden !important;
-  text-overflow: ellipsis;
-}
-section.historico_container section.history table#video-list tr td.convertVideoTime span.convertedAt {
-  color: rgb(179, 146, 0);
-}
-section.historico_container section.history .cleanHistoryBtn_container {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  display: flex;
-  padding: 50px 20px;
-}
-section.historico_container section.history .cleanHistoryBtn_container span {
-  padding: 10px;
-  background-color: #4f008f;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-section.historico_container section.history .cleanHistoryBtn_container span:hover {
-  transform: scale(1.1);
-  background-color: #470081;
 }/*# sourceMappingURL=styles.css.map */

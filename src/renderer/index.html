@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Converter Videos</title>
     <link rel="stylesheet" href="./styles/styles.css" />
-    <link rel="stylesheet" href="./styles/history.css" />
+
     <script
       src="https://kit.fontawesome.com/2e576afcbf.js"
       crossorigin="anonymous"
@@ -12,105 +12,85 @@
   </head>
 
   <body>
-    <section class="videoConversor" id="videoConversor_container">
-      <header>
-        <div class="menu">
-          <div class="menu">
-            <div class="menu_item">
-              <span class="currentPage">Conversor de videos</span>
-            </div>
-            <div class="menu_item">
-              <span id="openHistoryBtn">Historico</span>
-            </div>
-          </div>
+    <header>
+      <form>
+        <div>
+          <label id="labelForinput-file" class="form_item" for="input-file"
+            ><i class="fa-solid fa-plus"></i> Adicionar videos...</label
+          >
+          <input
+            class="form_item"
+            type="file"
+            name="input-file"
+            id="input-file"
+            multiple
+            required
+          />
+
+          <select id="output-format">
+            <option value="mp4"><span>Converter para MP4</span></option>
+            <option value="avi"><span>Converter para AVI</span></option>
+            <option value="mov"><span>Converter para MOV</span></option>
+          </select>
         </div>
-        <div class="conversor_functions">
-          <form>
-            <div>
-              <label id="labelForinput-file" class="form_item" for="input-file"
-                ><i class="fa-solid fa-plus"></i> Adicionar videos...</label
-              >
-              <input
-                class="form_item"
-                type="file"
-                name="input-file"
-                id="input-file"
-                multiple
-                required
-              />
 
-              <select id="output-format">
-                <option value="mp4"><span>Converter para MP4</span></option>
-                <option value="avi"><span>Converter para AVI</span></option>
-                <option value="mov"><span>Converter para MOV</span></option>
-              </select>
-            </div>
-
-            <div>
-              <button id="convert-button" class="form_item">
-                <i class="fa-solid fa-rotate-right"></i> Converter
-              </button>
-            </div>
-          </form>
+        <div>
+          <button id="convert-button" class="form_item">
+            <i class="fa-solid fa-rotate-right"></i> Converter
+          </button>
         </div>
-      </header>
+      </form>
+      <div class="bar">
+        <span id="convertingbtn" class="currenteVideoList">Convertendo</span>
+        <span id="convertedBtn">Convertidos</span>
+      </div>
+    </header>
 
-      <div id="videos_for_converte_Container">
+    <div id="videos_for_converte_Container">
+      <div id="convertingList">
         <p>
           Adicione videos para converter clicando no botão acima "Adicionar
           videos"...
         </p>
       </div>
 
-      <div class="progress-bar_container">
-        <p id="progress-video"></p>
-        <progress id="progress-bar" value="0" max="100"></progress>
-        <p id="progress-text">0%</p>
-      </div>
-    </section>
-
-    <section class="historico_container" id="historico_container">
-      <header>
-        <div class="menu">
-          <div class="menu">
-            <div class="menu_item">
-              <span id="vidoeConversorbtn">Conversor de videos</span>
-            </div>
-            <div class="menu_item">
-              <span id="openHistoryBtn" class="currentPage">Historico</span>
-            </div>
-          </div>
-        </div>
-      </header>
-      <section class="history">
+      <div id="convertedList">
         <h2>Historico de conversão</h2>
         <table id="video-list" border="0"></table>
 
         <div class="cleanHistoryBtn_container">
-          <span id="clearHistoryBtn">Limpar Historico</span>
+          <span id="clearHistoryBtn">Clear</span>
         </div>
-      </section>
-    </section>
+      </div>
+    </div>
+
+    <div class="progress-bar_container">
+      <p id="progress-video"></p>
+      <progress id="progress-bar" value="0" max="100"></progress>
+      <p id="progress-text">0%</p>
+    </div>
 
     <script src="./renderer.js"></script>
     <script>
-      const videoConversor_container = document.getElementById(
-        "videoConversor_container"
-      );
-      const historico_container = document.getElementById(
-        "historico_container"
-      );
-      const openHistoryBtn = document.getElementById("openHistoryBtn");
-      const vidoeConversorbtn = document.getElementById("vidoeConversorbtn");
+      // const videosForConverteContainer =
+      // const convertedList = document.getElementById("convertedList");
+      // const convertingList = document.querySelector("#convertingList");
 
-      vidoeConversorbtn.addEventListener("click", () => {
-        historico_container.style.display = "none";
-        videoConversor_container.style.display = "block";
+      const convertingbtn = document.getElementById("convertingbtn");
+      const convertedBtn = document.getElementById("convertedBtn");
+
+      convertingbtn.addEventListener("click", () => {
+        convertedBtn.classList.remove("currenteVideoList");
+        convertingbtn.classList.add("currenteVideoList");
+        convertedList.style.display = "none";
+        convertingList.style.display = "block";
       });
 
-      openHistoryBtn.addEventListener("click", () => {
-        videoConversor_container.style.display = "none";
-        historico_container.style.display = "block";
+      convertedBtn.addEventListener("click", () => {
+        convertingbtn.classList.remove("currenteVideoList");
+        convertedBtn.classList.add("currenteVideoList");
+        convertingList.style.display = "none";
+        convertedList.style.display = "block";
       });
     </script>
   </body>
