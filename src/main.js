@@ -4,7 +4,7 @@ const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
-const isDev = process.env.NODE_ENV !== "production";
+const isDev = true;
 let mainWindow;
 
 //Get the paths to the packaged versions of the binaries we want to use

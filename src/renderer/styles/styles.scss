@@ -192,6 +192,12 @@ header {
   #convertingList {
     overflow: auto;
     display: block;
+
+    p {
+      text-align: center;
+      padding: 100px 20px;
+    }
+
     div.videoItemList {
       background-color: $color-bg;
       margin-bottom: 5px;
@@ -208,6 +214,10 @@ header {
           list-style: none;
           display: flex;
           flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px;
+
           li {
             margin: 5px 10px;
             span {

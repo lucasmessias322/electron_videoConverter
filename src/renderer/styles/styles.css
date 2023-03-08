@@ -151,6 +151,10 @@ header div.bar span.currenteVideoList {
   overflow: auto;
   display: block;
 }
+#videos_for_converte_Container #convertingList p {
+  text-align: center;
+  padding: 100px 20px;
+}
 #videos_for_converte_Container #convertingList div.videoItemList {
   background-color: #252525;
   margin-bottom: 5px;
@@ -167,6 +171,9 @@ header div.bar span.currenteVideoList {
   list-style: none;
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
 }
 #videos_for_converte_Container #convertingList div.videoItemList div.video_source ul li {
   margin: 5px 10px;
