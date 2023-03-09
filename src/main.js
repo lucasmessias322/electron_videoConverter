@@ -4,6 +4,8 @@ const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
+const { formatSize, formatDuration } = require("./helpers/format");
+
 const isDev = false;
 let mainWindow;
 
@@ -118,11 +120,13 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
         mainWindow.webContents.send("conversion-started", videoName);
       })
       .on("progress", (progress) => {
-        mainWindow.webContents.send(
-          "conversion-progress",
-          videoName,
-          Math.round(progress.percent)
-        );
+        const percent = Math.round(progress.percent);
+        const timemark = formatDuration(progress.timemark);
+
+        mainWindow.webContents.send("conversion-progress", videoName, {
+          percent,
+          timemark,
+        });
       })
       .on("end", () => {
         fs.copyFile(outputPath, outputFile, (err) => {
@@ -160,10 +164,10 @@ async function getVideoInformation(videoName, videoPath) {
         return;
       }
 
-      const duration = metadata.format.duration;
+      const duration = formatDuration(metadata.format.duration);
       const codecs = metadata.streams.map((stream) => stream.codec_name);
       const resolution = `${metadata.streams[0].width}x${metadata.streams[0].height}`;
-      const size = metadata.format.size;
+      const size = formatSize(metadata.format.size);
       const format = metadata.format.format_long_name;
 
       resolve({

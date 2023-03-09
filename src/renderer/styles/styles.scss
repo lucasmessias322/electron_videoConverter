@@ -94,18 +94,28 @@ header {
 
   div.bar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding: 10px;
     border-top: 1px solid $color-border;
+    div.btns {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 60%;
 
-    span {
-      background-color: $color-videoConverted;
-      padding: 10px 20px;
+      span {
+        background-color: $color-videoConverted;
+        padding: 10px 20px;
+      }
+
+      span.currenteVideoList {
+        background-color: $color-button;
+      }
     }
-
-    span.currenteVideoList {
-      background-color: $color-button;
+    span#NumberOfvideosOnList {
+      padding: 10px 20px;
+      text-align: left;
     }
   }
 }
@@ -114,13 +124,11 @@ header {
   height: 100vh;
   width: 100%;
   background-color: $color-videosList;
-  padding-top: 155px;
-  padding-bottom: 100px;
-  // display: flex;
-  // flex-direction: column;
+  padding-top: 150px;
 
   #convertedList {
     overflow: auto;
+    padding-bottom: 100px;
     display: none;
     width: 100%;
     height: 100%;
@@ -131,34 +139,36 @@ header {
       padding: 20px 0px;
     }
 
-    table#video-list {
+    table {
       color: whitesmoke;
       padding: 20px;
       width: 100%;
 
-      tr {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+      tbody#video-list {
+        tr {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
 
-        td {
-          padding: 0px 10px;
-          font-size: 14px;
-        }
-
-        td.videoName {
-          span.converted {
-            display: inline-block;
-            max-width: 500px;
-            white-space: nowrap;
-            overflow: hidden !important;
-            text-overflow: ellipsis;
+          td {
+            padding: 0px 10px;
+            font-size: 14px;
           }
-        }
 
-        td.convertVideoTime {
-          span.convertedAt {
-            color: rgb(179, 146, 0);
+          td.videoName {
+            span.converted {
+              display: inline-block;
+              max-width: 500px;
+              white-space: nowrap;
+              overflow: hidden !important;
+              text-overflow: ellipsis;
+            }
+          }
+
+          td.convertVideoTime {
+            span.convertedAt {
+              color: rgb(179, 146, 0);
+            }
           }
         }
       }
@@ -190,6 +200,9 @@ header {
   }
 
   #convertingList {
+    padding-bottom: 100px;
+    height: 100%;
+    width: 100%;
     overflow: auto;
     display: block;
 

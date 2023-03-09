@@ -1,6 +1,7 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
-const db = require("../config/DbConfig");
+// const moment = require("moment");
+const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
 const { v4: uuidv4 } = require("uuid");
 
 const form = document.querySelector("form");
@@ -12,7 +13,10 @@ const progressVideo = document.querySelector("#progress-video");
 const convertingList = document.querySelector("#convertingList");
 const tablevideo_list = document.getElementById("video-list");
 const clearHistoryBtn = document.querySelector("#clearHistoryBtn");
+const NumberOfvideosOnList = document.getElementById("NumberOfvideosOnList");
 
+const progressData = document.getElementById("progressData");
+let videosOnlistForConvert = [];
 //Armazena o historico de conversão de videos
 let videoHistory = [];
 
@@ -36,6 +40,8 @@ clearHistoryBtn.addEventListener("click", () => {
 inputField.addEventListener("change", async () => {
   const inputFiles = inputField.files;
   convertingList.innerHTML = "";
+  NumberOfvideosOnList.innerText = "";
+  videosOnlistForConvert = [];
 
   for (let i = 0; i < inputFiles.length; i++) {
     try {
@@ -45,6 +51,8 @@ inputField.addEventListener("change", async () => {
         inputFiles[i].name,
         inputFiles[i].path
       );
+      videosOnlistForConvert.push(inputFiles[i]);
+      NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
     } catch (error) {
       console.log(error);
     }
@@ -86,8 +94,9 @@ ipcRenderer.on("conversion-started", (event, videoName) => {});
 
 ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
   const spanTag = document.getElementById(videoName);
+
   if (spanTag) {
-    if (progress === 100) {
+    if (progress.percent === 100) {
       spanTag.classList.remove("converting");
       spanTag.classList.add("converted");
     } else {
@@ -96,17 +105,25 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
   }
 
   progressVideo.innerText = `Converting: ${videoName}`;
-  progressBar.value = progress;
-  progressText.innerText = `${progress}%`;
+  progressBar.value = progress.percent;
+  progressText.innerText = `${progress.percent}%`;
+  progressData.innerHTML = `
+  <span>Tempo decorrido: ${progress.timemark}</span>
+  `;
 });
 
 ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   const fileConvertedSpanTag = document.getElementById(videoName);
+
   progressBar.value = 0;
   progressText.innerHTML = "0%";
   progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
+
+  videosOnlistForConvert.shift();
+  NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
+
   addVideosConvertedOnHistory(videoName);
 });
 
@@ -139,18 +156,17 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
           <li>
           <span class="icon"><i class="fa-regular fa-clock"></i> </span>
           <span class="videoInfo" >
-            ${formatVideoLength(videoInfo.duration)}
+            ${videoInfo.duration}
           </span>
           </li>
           <li>
             <span class="icon"><i class="fa-regular fa-folder"></i> </span>
             <span class="videoInfo" >
-              ${formatSize(videoInfo.size)}
+              ${videoInfo.size}
             </span>
           </li>
         </ul>
       </div>
-      
     </div>`;
 
   convertingList.innerHTML += item;
@@ -182,33 +198,7 @@ async function addVideosConvertedOnHistory(videoName) {
   });
 }
 
-async function deleteDbData() {
-  db.allDocs({ include_docs: true })
-    .then(function (docs) {
-      // Cria um objeto com todos os documentos e o campo _deleted definido como true
-      var docsToDelete = docs.rows.map(function (row) {
-        return {
-          _id: row.doc._id,
-          _rev: row.doc._rev,
-          _deleted: true,
-        };
-      });
-
-      // Deleta todos os documentos do banco de dados
-      db.bulkDocs(docsToDelete)
-        .then(function (result) {
-          console.log("Todos os documentos foram deletados com sucesso!");
-        })
-        .catch(function (err) {
-          console.log("Erro ao deletar documentos:", err);
-        });
-    })
-    .catch(function (err) {
-      console.log("Erro ao recuperar documentos:", err);
-    });
-}
-
-function LoadHistory(dataArray = []) {
+function LoadHistory(dataArray = [], cb) {
   tablevideo_list.innerHTML = "";
   if (dataArray.length > 0) {
     for (let i = 0; i < dataArray.length; i++) {
@@ -219,37 +209,12 @@ function LoadHistory(dataArray = []) {
                         <span class="convertedAt">${dataArray[i].convertedAt}</span></td>
                     </tr>`;
       tablevideo_list.innerHTML += item;
+
+      if (dataArray[i] === dataArray.length - 1) {
+        cb();
+      }
     }
   } else {
     tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
-}
-
-async function consultarDb(cb) {
-  await db.allDocs({ include_docs: true }, function (err, response) {
-    if (err) {
-      console.log(err);
-    } else {
-      cb(response.rows);
-    }
-  });
-}
-
-function formatSize(size) {
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  let i = 0;
-  while (size >= 1024 && i < units.length - 1) {
-    size /= 1024;
-    i++;
-  }
-  return `${size.toFixed(2)} ${units[i]}`;
-}
-
-function formatVideoLength(length) {
-  const hours = Math.floor(length / 3600);
-  const minutes = Math.floor((length - hours * 3600) / 60);
-  const seconds = length % 60;
-  return `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }

@@ -71,28 +71,38 @@ header form #output-format {
 }
 header div.bar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 10px;
   border-top: 1px solid rgb(51, 51, 51);
 }
-header div.bar span {
+header div.bar div.btns {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 60%;
+}
+header div.bar div.btns span {
   background-color: #1a1a1a;
   padding: 10px 20px;
 }
-header div.bar span.currenteVideoList {
+header div.bar div.btns span.currenteVideoList {
   background-color: #4f008f;
+}
+header div.bar span#NumberOfvideosOnList {
+  padding: 10px 20px;
+  text-align: left;
 }
 
 #videos_for_converte_Container {
   height: 100vh;
   width: 100%;
   background-color: #181818;
-  padding-top: 155px;
-  padding-bottom: 100px;
+  padding-top: 150px;
 }
 #videos_for_converte_Container #convertedList {
   overflow: auto;
+  padding-bottom: 100px;
   display: none;
   width: 100%;
   height: 100%;
@@ -102,28 +112,28 @@ header div.bar span.currenteVideoList {
   color: rgb(175, 175, 175);
   padding: 20px 0px;
 }
-#videos_for_converte_Container #convertedList table#video-list {
+#videos_for_converte_Container #convertedList table {
   color: whitesmoke;
   padding: 20px;
   width: 100%;
 }
-#videos_for_converte_Container #convertedList table#video-list tr {
+#videos_for_converte_Container #convertedList table tbody#video-list tr {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-#videos_for_converte_Container #convertedList table#video-list tr td {
+#videos_for_converte_Container #convertedList table tbody#video-list tr td {
   padding: 0px 10px;
   font-size: 14px;
 }
-#videos_for_converte_Container #convertedList table#video-list tr td.videoName span.converted {
+#videos_for_converte_Container #convertedList table tbody#video-list tr td.videoName span.converted {
   display: inline-block;
   max-width: 500px;
   white-space: nowrap;
   overflow: hidden !important;
   text-overflow: ellipsis;
 }
-#videos_for_converte_Container #convertedList table#video-list tr td.convertVideoTime span.convertedAt {
+#videos_for_converte_Container #convertedList table tbody#video-list tr td.convertVideoTime span.convertedAt {
   color: rgb(179, 146, 0);
 }
 #videos_for_converte_Container #convertedList .cleanHistoryBtn_container {
@@ -148,6 +158,9 @@ header div.bar span.currenteVideoList {
   background-color: #470081;
 }
 #videos_for_converte_Container #convertingList {
+  padding-bottom: 100px;
+  height: 100%;
+  width: 100%;
   overflow: auto;
   display: block;
 }

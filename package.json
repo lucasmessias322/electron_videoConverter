@@ -20,6 +20,7 @@
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2",
+    "moment": "^2.29.4",
     "pouchdb": "^8.0.1",
     "uuid": "^9.0.0"
   },

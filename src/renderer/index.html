@@ -41,8 +41,12 @@
         </div>
       </form>
       <div class="bar">
-        <span id="convertingbtn" class="currenteVideoList">Convertendo</span>
-        <span id="convertedBtn">Convertidos</span>
+        <div class="btns">
+          <span id="convertingbtn" class="currenteVideoList">Convertendo</span>
+          <span id="convertedBtn">Convertidos</span>
+        </div>
+
+        <span id="NumberOfvideosOnList"></span>
       </div>
     </header>
 
@@ -56,7 +60,9 @@
 
       <div id="convertedList">
         <h2>Historico de conversão</h2>
-        <table id="video-list" border="0"></table>
+        <table border="0">
+          <tbody id="video-list"></tbody>
+        </table>
 
         <div class="cleanHistoryBtn_container">
           <span id="clearHistoryBtn">Clear</span>
@@ -68,6 +74,7 @@
       <p id="progress-video"></p>
       <progress id="progress-bar" value="0" max="100"></progress>
       <p id="progress-text">0%</p>
+      <div id="progressData"></div>
     </div>
 
     <script src="./renderer.js"></script>
