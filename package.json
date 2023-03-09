@@ -24,9 +24,9 @@
     "uuid": "^9.0.0"
   },
   "build": {
-    "productName": "Video Converter",
+    "productName": "ConvertHero",
     "win": {
-      "icon": "icons/icon.ico",
+      "icon": "./convertHero.ico",
       "target": [
         "nsis"
       ]
@@ -37,15 +37,17 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Video Converter"
+      "shortcutName": "ConvertHero"
     },
     "files": [
       "dist/**/*",
       "package.json",
       "src/main.js",
       "src/renderer/renderer.js",
+      "src/config/DbConfig.js",
       "src/renderer/index.html",
-      "src/renderer/styles/styles.css"
+      "src/renderer/styles/styles.css",
+      "my_database"
     ],
     "asarUnpack": [
       "node_modules/ffmpeg-static/bin/${os}/${arch}/ffmpeg",

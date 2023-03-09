@@ -4,7 +4,7 @@ const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 
-const isDev = true;
+const isDev = false;
 let mainWindow;
 
 //Get the paths to the packaged versions of the binaries we want to use
@@ -35,7 +35,8 @@ function createWindow() {
     maximizable: true,
     fullscreen: false,
     resizable: true,
-    title: "Conversor de video",
+    title: "ConvertHero",
+    icon: "../convertHero.ico",
   });
 
   if (isDev) {

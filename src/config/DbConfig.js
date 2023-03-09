@@ -1,12 +1,6 @@
-const PouchDB = require('pouchdb');
-const db = new PouchDB('my_database');
+const PouchDB = require("pouchdb");
+const path = require("path");
+const saveDb = path.resolve("..", "..", "./my_database");
+const db = new PouchDB(saveDb);
 
-// db.allDocs({include_docs: true}, function(err, response) {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       console.log(response.rows);
-//     }
-//   })
-
-module.exports = db
+module.exports = db;
