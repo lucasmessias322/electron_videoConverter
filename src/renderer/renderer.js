@@ -1,8 +1,8 @@
+/* eslint-disable no-unused-vars */
 const { ipcRenderer } = require("electron");
 const path = require("path");
-// const moment = require("moment");
 const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 
 const form = document.querySelector("form");
 const inputField = document.querySelector("#input-file");
@@ -131,6 +131,15 @@ ipcRenderer.on("conversion-error", (event, videoName, error) => {
   window.alert(`Erro ao converter: ${videoName} erro: ${error}`);
 });
 
+let VideoInfoAnalysisList = [];
+ipcRenderer.on("Videoinfoanalysis-started", (event, videoName) => {
+  VideoInfoAnalysisList.push(videoName);
+
+  if (VideoInfoAnalysisList.length <= 1) {
+    window.alert("Analizando informaçoes dos videos");
+  }
+});
+
 // retorna as infomaçoes dos videos
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
   const item = `
@@ -181,7 +190,7 @@ async function addVideosConvertedOnHistory(videoName) {
   const now = new Date().toLocaleString();
 
   const doc = {
-    _id: uuidv4(),
+    _id: generateId(),
     name: videoName,
     convertedAt: now,
   };
@@ -217,4 +226,9 @@ function LoadHistory(dataArray = [], cb) {
   } else {
     tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
+}
+
+function generateId() {
+  const id = crypto.randomBytes(16).toString("hex");
+  return id;
 }

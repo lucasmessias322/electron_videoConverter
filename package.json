@@ -17,12 +17,12 @@
     "nodemon": "^2.0.21"
   },
   "dependencies": {
+    "electron-is-dev": "^2.0.0",
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "moment": "^2.29.4",
-    "pouchdb": "^8.0.1",
-    "uuid": "^9.0.0"
+    "pouchdb": "^8.0.1"
   },
   "build": {
     "productName": "ConvertHero",
@@ -43,11 +43,7 @@
     "files": [
       "dist/**/*",
       "package.json",
-      "src/main.js",
-      "src/renderer/renderer.js",
-      "src/config/DbConfig.js",
-      "src/renderer/index.html",
-      "src/renderer/styles/styles.css",
+      "src",
       "my_database"
     ],
     "asarUnpack": [

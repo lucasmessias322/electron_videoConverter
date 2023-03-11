@@ -6,7 +6,7 @@ const fs = require("fs");
 
 const { formatSize, formatDuration } = require("./helpers/format");
 
-const isDev = false;
+const isDev = require("electron-is-dev");
 let mainWindow;
 
 //Get the paths to the packaged versions of the binaries we want to use
@@ -154,6 +154,8 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
 }
 
 async function getVideoInformation(videoName, videoPath) {
+  mainWindow.webContents.send("Videoinfoanalysis-started", videoName);
+
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
