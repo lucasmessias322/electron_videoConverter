@@ -3,26 +3,28 @@ const path = require("path");
 const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
 const crypto = require("crypto");
 
-const form = document.querySelector("form");
-const inputField = document.querySelector("#input-file");
-const outputFormatField = document.querySelector("#output-format");
-const progressBar = document.querySelector("#progress-bar");
-const progressText = document.querySelector("#progress-text");
-const progressVideo = document.querySelector("#progress-video");
-const convertingList = document.querySelector("#convertingList");
-const tablevideo_list = document.getElementById("video-list");
-const clearHistoryBtn = document.querySelector("#clearHistoryBtn");
-const NumberOfvideosOnList = document.getElementById("NumberOfvideosOnList");
-const convertButton = document.getElementById("convert-button");
-const cancelButton = document.getElementById("cancelButton");
-const progressData = document.getElementById("progressData");
-const btnsConvertionContainer = document.getElementById(
-  "btnsConvertionContainer"
-);
+const UiImports = {
+  form: document.querySelector("form"),
+  inputField: document.querySelector("#input-file"),
+  outputFormatField: document.querySelector("#output-format"),
+  progressBar: document.querySelector("#progress-bar"),
+  progressText: document.querySelector("#progress-text"),
+  progressVideo: document.querySelector("#progress-video"),
+  convertingList: document.querySelector("#convertingList"),
+  tablevideo_list: document.getElementById("video-list"),
+  clearHistoryBtn: document.querySelector("#clearHistoryBtn"),
+  NumberOfvideosOnList: document.getElementById("NumberOfvideosOnList"),
+  convertButton: document.getElementById("convert-button"),
+  cancelButton: document.getElementById("cancelButton"),
+  progressData: document.getElementById("progressData"),
+  btnsConvertionContainer: document.getElementById("btnsConvertionContainer"),
+};
+
 let videosOnlistForConvert = [];
 //Armazena o historico de conversão de videos
 let videoHistory = [];
 // coleta os dados do banco de dados e retorna um array com os dados
+
 consultarDb((data) => {
   // percorre o array data para armazenar somente o doc no array videoHistory
   data.forEach((element) => {
@@ -33,16 +35,16 @@ consultarDb((data) => {
   LoadHistory(videoHistory);
 });
 
-clearHistoryBtn.addEventListener("click", () => {
+UiImports.clearHistoryBtn.addEventListener("click", () => {
   deleteDbData();
-  tablevideo_list.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+  UiImports.tablevideo_list.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
 });
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
-inputField.addEventListener("change", async () => {
-  const inputFiles = inputField.files;
-  convertingList.innerHTML = "";
-  NumberOfvideosOnList.innerText = "";
+UiImports.inputField.addEventListener("change", async () => {
+  const inputFiles = UiImports.inputField.files;
+  UiImports.convertingList.innerHTML = "";
+  UiImports.NumberOfvideosOnList.innerText = "";
   videosOnlistForConvert = [];
 
   for (let i = 0; i < inputFiles.length; i++) {
@@ -54,7 +56,7 @@ inputField.addEventListener("change", async () => {
         inputFiles[i].path
       );
       videosOnlistForConvert.push(inputFiles[i]);
-      NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
+      UiImports.NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
     } catch (error) {
       console.log(error);
     }
@@ -63,11 +65,11 @@ inputField.addEventListener("change", async () => {
 
 let outputPath = null;
 
-form.addEventListener("submit", async (event) => {
+UiImports.form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const inputFiles = inputField.files;
-  const outputFormat = outputFormatField.value;
+  const inputFiles = UiImports.inputField.files;
+  const outputFormat = UiImports.outputFormatField.value;
 
   const destination = await ipcRenderer.invoke("select-directory");
   if (!destination) return;
@@ -91,15 +93,15 @@ form.addEventListener("submit", async (event) => {
     }
   }
 
-  progressVideo.innerText = "";
+  UiImports.progressVideo.innerText = "";
 });
 let currentConvertion = null;
 
 ipcRenderer.on("conversion-started", (event, videoName) => {
   currentConvertion = videoName;
 
-  convertButton.classList.add("hiden");
-  cancelButton.classList.remove("hiden");
+  UiImports.convertButton.classList.add("hiden");
+  UiImports.cancelButton.classList.remove("hiden");
 });
 
 cancelButton.addEventListener("click", () => {
@@ -108,7 +110,7 @@ cancelButton.addEventListener("click", () => {
 
 ipcRenderer.on("canceled-video-conversion", (event, videoName) => {
   const spanTag = document.getElementById(videoName);
-  progressBar.value = 0;
+  UiImports.progressBar.value = 0;
   if (spanTag) {
     spanTag.classList.remove("converting");
     spanTag.classList.add("canceledvideoconversion");
@@ -127,10 +129,10 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
     }
   }
 
-  progressVideo.innerText = `Converting: ${videoName}`;
-  progressBar.value = progress.percent;
-  progressText.innerText = `${progress.percent}%`;
-  progressData.innerHTML = `
+  UiImports.progressVideo.innerText = `Converting: ${videoName}`;
+  UiImports.progressBar.value = progress.percent;
+  UiImports.progressText.innerText = `${progress.percent}%`;
+  UiImports.progressData.innerHTML = `
   <span>Tempo decorrido: ${progress.timemark}</span>
   `;
 });
@@ -138,17 +140,17 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
 ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   const fileConvertedSpanTag = document.getElementById(videoName);
 
-  cancelButton.classList.add("hiden");
-  convertButton.classList.remove("hiden");
+  UiImports.cancelButton.classList.add("hiden");
+  UiImports.convertButton.classList.remove("hiden");
 
-  progressBar.value = 0;
-  progressText.innerHTML = "0%";
-  progressVideo.innerText = "";
+  UiImports.progressBar.value = 0;
+  UiImports.progressText.innerHTML = "0%";
+  UiImports.progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
 
   videosOnlistForConvert.shift();
-  NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
+  UiImports.NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
 
   addVideosConvertedOnHistory(videoName);
 });
@@ -204,12 +206,12 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
       </div>
     </div>`;
 
-  convertingList.innerHTML += item;
+  UiImports.convertingList.innerHTML += item;
 });
 
 ipcRenderer.on("video-comrropido", (event, videoName, err) => {
-  inputField.value = "";
-  convertingList.innerHTML = "";
+  UiImports.inputField.value = "";
+  UiImports.convertingList.innerHTML = "";
 });
 
 async function addVideosConvertedOnHistory(videoName) {
@@ -234,7 +236,7 @@ async function addVideosConvertedOnHistory(videoName) {
 }
 
 function LoadHistory(dataArray = [], cb) {
-  tablevideo_list.innerHTML = "";
+  UiImports.tablevideo_list.innerHTML = "";
   if (dataArray.length > 0) {
     for (let i = 0; i < dataArray.length; i++) {
       const item = `<tr>
@@ -243,14 +245,14 @@ function LoadHistory(dataArray = [], cb) {
                         <td class="convertVideoTime">
                         <span class="convertedAt">${dataArray[i].convertedAt}</span></td>
                     </tr>`;
-      tablevideo_list.innerHTML += item;
+      UiImports.tablevideo_list.innerHTML += item;
 
       if (dataArray[i] === dataArray.length - 1) {
         cb();
       }
     }
   } else {
-    tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+    UiImports.tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
 }
 
