@@ -69,17 +69,37 @@ header {
       }
     }
 
-    button#convert-button {
-      background-color: $color-button;
-      outline: none;
-      padding: 15px 20px;
-      border-radius: 5px;
-      color: $color-button-text;
-      border: none;
-      font-size: 16px;
+    .btns-convertion {
+      display: flex;
+      align-items: center;
 
-      &:hover {
-        background-color: $color-button-hover;
+      div#cancelButton {
+        background-color: $color-button;
+        padding: 15px 20px;
+        color: $color-button-text;
+        border-radius: 5px;
+        font-size: 16px;
+        &:hover {
+          background-color: $color-button-hover;
+        }
+      }
+
+      button#convert-button {
+        background-color: $color-button;
+        outline: none;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: $color-button-text;
+        border: none;
+        font-size: 16px;
+
+        &:hover {
+          background-color: $color-button-hover;
+        }
+      }
+
+      .hiden {
+        display: none;
       }
     }
 
@@ -98,6 +118,7 @@ header {
     align-items: center;
     padding: 10px;
     border-top: 1px solid $color-border;
+    box-shadow: 10px 5px 5px #1818187a;
     div.btns {
       display: flex;
       justify-content: flex-end;
@@ -124,7 +145,7 @@ header {
   height: 100vh;
   width: 100%;
   background-color: $color-videosList;
-  padding-top: 150px;
+  padding-top: 140px;
 
   #convertedList {
     overflow: auto;
@@ -249,12 +270,16 @@ header {
     div.converted {
       background-color: $color-videoConverted;
     }
+
+    div.canceledvideoconversion {
+      background-color: rgba(255, 66, 66, 0.082);
+    }
   }
 }
 
 .progress-bar_container {
   background-color: $color-bg;
-  box-shadow: 10px 10px 10px 10px $color-videosList;
+  box-shadow: 10px 5px 5px #1818187a;
   display: flex;
   flex-direction: column;
   border-top: 0.5px solid $color-border;

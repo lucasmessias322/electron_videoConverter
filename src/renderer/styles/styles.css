@@ -50,7 +50,21 @@ header form label#labelForinput-file {
 header form label#labelForinput-file:hover {
   background-color: #380066;
 }
-header form button#convert-button {
+header form .btns-convertion {
+  display: flex;
+  align-items: center;
+}
+header form .btns-convertion div#cancelButton {
+  background-color: #4f008f;
+  padding: 15px 20px;
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+}
+header form .btns-convertion div#cancelButton:hover {
+  background-color: #380066;
+}
+header form .btns-convertion button#convert-button {
   background-color: #4f008f;
   outline: none;
   padding: 15px 20px;
@@ -59,8 +73,11 @@ header form button#convert-button {
   border: none;
   font-size: 16px;
 }
-header form button#convert-button:hover {
+header form .btns-convertion button#convert-button:hover {
   background-color: #380066;
+}
+header form .btns-convertion .hiden {
+  display: none;
 }
 header form #output-format {
   padding: 10px;
@@ -75,6 +92,7 @@ header div.bar {
   align-items: center;
   padding: 10px;
   border-top: 1px solid rgb(51, 51, 51);
+  box-shadow: 10px 5px 5px rgba(24, 24, 24, 0.4784313725);
 }
 header div.bar div.btns {
   display: flex;
@@ -98,7 +116,7 @@ header div.bar span#NumberOfvideosOnList {
   height: 100vh;
   width: 100%;
   background-color: #181818;
-  padding-top: 150px;
+  padding-top: 140px;
 }
 #videos_for_converte_Container #convertedList {
   overflow: auto;
@@ -203,10 +221,13 @@ header div.bar span#NumberOfvideosOnList {
 #videos_for_converte_Container #convertingList div.converted {
   background-color: #1a1a1a;
 }
+#videos_for_converte_Container #convertingList div.canceledvideoconversion {
+  background-color: rgba(255, 66, 66, 0.082);
+}
 
 .progress-bar_container {
   background-color: #252525;
-  box-shadow: 10px 10px 10px 10px #181818;
+  box-shadow: 10px 5px 5px rgba(24, 24, 24, 0.4784313725);
   display: flex;
   flex-direction: column;
   border-top: 0.5px solid rgb(51, 51, 51);

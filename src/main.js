@@ -1,13 +1,14 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, Menu, Tray } = require("electron");
 const path = require("path");
 const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
-
-const { formatSize, formatDuration } = require("./helpers/format");
-
+const {
+  formatSize,
+  formatDuration,
+  formatDurationMoment,
+} = require("./helpers/format");
 const isDev = require("electron-is-dev");
-let mainWindow;
 
 //Get the paths to the packaged versions of the binaries we want to use
 const ffmpegPath = require("ffmpeg-static").replace(
@@ -19,6 +20,9 @@ const ffprobePath = require("ffprobe-static").path.replace(
   "app.asar.unpacked"
 );
 
+const iconPc = path.join(__dirname, "..", "convertHero.png");
+
+let mainWindow;
 //tell the ffmpeg package where it can find the needed binaries.
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
@@ -38,7 +42,7 @@ function createWindow() {
     fullscreen: false,
     resizable: true,
     title: "ConvertHero",
-    icon: "../convertHero.ico",
+    icon: iconPc,
   });
 
   if (isDev) {
@@ -56,6 +60,19 @@ function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  const tray = new Tray(iconPc);
+
+  let trayMenu = Menu.buildFromTemplate([
+    {
+      label: "Close App",
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(trayMenu);
 }
 
 //Menu template
@@ -91,13 +108,20 @@ ipcMain.handle("select-directory", async (event) => {
   if (result.canceled) return null;
   return result.filePaths[0];
 });
-
+let conversionProcess = null;
 ipcMain.handle(
   "convert-video",
   async (event, videoName, inputFile, outputFile, destination) => {
     await convertVideo(videoName, inputFile, outputFile, destination);
   }
 );
+
+ipcMain.on("cancel-conversion", async (event, outputPath) => {
+  if (conversionProcess) {
+    await conversionProcess.kill("SIGINT");
+    // mainWindow.webContents.send("canceled-video-conversion");
+  }
+});
 
 ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
   await getVideoInformation(videoName, videoPath);
@@ -106,8 +130,8 @@ ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
 function convertVideo(videoName, inputFile, outputFile, destination) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(destination, path.basename(outputFile));
-
-    const command = ffmpeg(inputFile)
+    let startTime;
+    conversionProcess = ffmpeg(inputFile)
       .output(outputPath)
       .outputOptions("-c:v", "libx264")
       .outputOptions("-c:a", "aac")
@@ -118,10 +142,11 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
       .outputOptions("-preset", "fast")
       .on("start", () => {
         mainWindow.webContents.send("conversion-started", videoName);
+        startTime = Date.now(); // tempo inicial em milissegundos
       })
       .on("progress", (progress) => {
         const percent = Math.round(progress.percent);
-        const timemark = formatDuration(progress.timemark);
+        const timemark = formatDurationMoment(progress.timemark);
 
         mainWindow.webContents.send("conversion-progress", videoName, {
           percent,
@@ -144,12 +169,25 @@ function convertVideo(videoName, inputFile, outputFile, destination) {
         });
       })
       .on("error", (error) => {
-        reject(error);
-        dialog.showErrorBox(`Erro ao converter video(os)`, videoName);
-        mainWindow.webContents.send("conversion-error", videoName, error);
+        if (error.message === "ffmpeg was killed with signal SIGINT") {
+          reject("Error: ffmpeg was killed with signal SIGINT");
+
+          fs.unlink(outputPath, (err) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+
+            mainWindow.webContents.send("canceled-video-conversion", videoName);
+          });
+        } else {
+          reject(error);
+          dialog.showErrorBox(`Erro ao converter video(os)`, videoName);
+          mainWindow.webContents.send("conversion-error", videoName, error);
+        }
       });
 
-    command.run();
+    conversionProcess.run();
   });
 }
 

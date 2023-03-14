@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const { ipcRenderer } = require("electron");
 const path = require("path");
 const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
@@ -14,12 +13,15 @@ const convertingList = document.querySelector("#convertingList");
 const tablevideo_list = document.getElementById("video-list");
 const clearHistoryBtn = document.querySelector("#clearHistoryBtn");
 const NumberOfvideosOnList = document.getElementById("NumberOfvideosOnList");
-
+const convertButton = document.getElementById("convert-button");
+const cancelButton = document.getElementById("cancelButton");
 const progressData = document.getElementById("progressData");
+const btnsConvertionContainer = document.getElementById(
+  "btnsConvertionContainer"
+);
 let videosOnlistForConvert = [];
 //Armazena o historico de conversão de videos
 let videoHistory = [];
-
 // coleta os dados do banco de dados e retorna um array com os dados
 consultarDb((data) => {
   // percorre o array data para armazenar somente o doc no array videoHistory
@@ -59,6 +61,8 @@ inputField.addEventListener("change", async () => {
   }
 });
 
+let outputPath = null;
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -71,7 +75,7 @@ form.addEventListener("submit", async (event) => {
   for (let i = 0; i < inputFiles.length; i++) {
     const input = inputFiles[i].path;
     const output = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
-    const outputPath = path.join(destination, output);
+    outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
 
     try {
@@ -89,8 +93,27 @@ form.addEventListener("submit", async (event) => {
 
   progressVideo.innerText = "";
 });
+let currentConvertion = null;
 
-ipcRenderer.on("conversion-started", (event, videoName) => {});
+ipcRenderer.on("conversion-started", (event, videoName) => {
+  currentConvertion = videoName;
+
+  convertButton.classList.add("hiden");
+  cancelButton.classList.remove("hiden");
+});
+
+cancelButton.addEventListener("click", () => {
+  ipcRenderer.send("cancel-conversion", outputPath);
+});
+
+ipcRenderer.on("canceled-video-conversion", (event, videoName) => {
+  const spanTag = document.getElementById(videoName);
+  progressBar.value = 0;
+  if (spanTag) {
+    spanTag.classList.remove("converting");
+    spanTag.classList.add("canceledvideoconversion");
+  }
+});
 
 ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
   const spanTag = document.getElementById(videoName);
@@ -114,6 +137,9 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
 
 ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   const fileConvertedSpanTag = document.getElementById(videoName);
+
+  cancelButton.classList.add("hiden");
+  convertButton.classList.remove("hiden");
 
   progressBar.value = 0;
   progressText.innerHTML = "0%";
