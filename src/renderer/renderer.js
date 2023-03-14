@@ -3,7 +3,7 @@ const path = require("path");
 const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
 const crypto = require("crypto");
 
-const UiImports = {
+const uiElements = {
   form: document.querySelector("form"),
   inputField: document.querySelector("#input-file"),
   outputFormatField: document.querySelector("#output-format"),
@@ -21,30 +21,23 @@ const UiImports = {
 };
 
 let videosOnlistForConvert = [];
-//Armazena o historico de conversão de videos
 let videoHistory = [];
-// coleta os dados do banco de dados e retorna um array com os dados
+let VideoInfoAnalysisList = [];
+let outputPath = null;
+let currentConvertion = null;
 
-consultarDb((data) => {
-  // percorre o array data para armazenar somente o doc no array videoHistory
-  data.forEach((element) => {
-    videoHistory.push(element.doc);
-  });
+// Load video history from database and display it in the table
+loadVideoHistory();
 
-  // carrega o historico
-  LoadHistory(videoHistory);
-});
-
-UiImports.clearHistoryBtn.addEventListener("click", () => {
-  deleteDbData();
-  UiImports.tablevideo_list.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+uiElements.clearHistoryBtn.addEventListener("click", () => {
+  clearHistory();
 });
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
-UiImports.inputField.addEventListener("change", async () => {
-  const inputFiles = UiImports.inputField.files;
-  UiImports.convertingList.innerHTML = "";
-  UiImports.NumberOfvideosOnList.innerText = "";
+uiElements.inputField.addEventListener("change", async () => {
+  const inputFiles = uiElements.inputField.files;
+  uiElements.convertingList.innerHTML = "";
+  uiElements.NumberOfvideosOnList.innerText = "";
   videosOnlistForConvert = [];
 
   for (let i = 0; i < inputFiles.length; i++) {
@@ -56,20 +49,18 @@ UiImports.inputField.addEventListener("change", async () => {
         inputFiles[i].path
       );
       videosOnlistForConvert.push(inputFiles[i]);
-      UiImports.NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
+      uiElements.NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
     } catch (error) {
       console.log(error);
     }
   }
 });
 
-let outputPath = null;
-
-UiImports.form.addEventListener("submit", async (event) => {
+uiElements.form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const inputFiles = UiImports.inputField.files;
-  const outputFormat = UiImports.outputFormatField.value;
+  const inputFiles = uiElements.inputField.files;
+  const outputFormat = uiElements.outputFormatField.value;
 
   const destination = await ipcRenderer.invoke("select-directory");
   if (!destination) return;
@@ -93,46 +84,45 @@ UiImports.form.addEventListener("submit", async (event) => {
     }
   }
 
-  UiImports.progressVideo.innerText = "";
-});
-let currentConvertion = null;
-
-ipcRenderer.on("conversion-started", (event, videoName) => {
-  currentConvertion = videoName;
-
-  UiImports.convertButton.classList.add("hiden");
-  UiImports.cancelButton.classList.remove("hiden");
+  uiElements.progressVideo.innerText = "";
 });
 
 cancelButton.addEventListener("click", () => {
   ipcRenderer.send("cancel-conversion", outputPath);
 });
 
+// IPC ipcRenderer on
+ipcRenderer.on("conversion-started", (event, videoName) => {
+  currentConvertion = videoName;
+  uiElements.convertButton.classList.add("hiden");
+  uiElements.cancelButton.classList.remove("hiden");
+});
+
 ipcRenderer.on("canceled-video-conversion", (event, videoName) => {
-  const spanTag = document.getElementById(videoName);
-  UiImports.progressBar.value = 0;
-  if (spanTag) {
-    spanTag.classList.remove("converting");
-    spanTag.classList.add("canceledvideoconversion");
+  const divVideoItemListTag = document.getElementById(videoName);
+  uiElements.progressBar.value = 0;
+  if (divVideoItemListTag) {
+    divVideoItemListTag.classList.remove("converting");
+    divVideoItemListTag.classList.add("canceledvideoconversion");
   }
 });
 
 ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
-  const spanTag = document.getElementById(videoName);
+  const divVideoItemListTag = document.getElementById(videoName);
 
-  if (spanTag) {
+  if (divVideoItemListTag) {
     if (progress.percent === 100) {
-      spanTag.classList.remove("converting");
-      spanTag.classList.add("converted");
+      divVideoItemListTag.classList.remove("converting");
+      divVideoItemListTag.classList.add("converted");
     } else {
-      spanTag.classList.add("converting");
+      divVideoItemListTag.classList.add("converting");
     }
   }
 
-  UiImports.progressVideo.innerText = `Converting: ${videoName}`;
-  UiImports.progressBar.value = progress.percent;
-  UiImports.progressText.innerText = `${progress.percent}%`;
-  UiImports.progressData.innerHTML = `
+  uiElements.progressVideo.innerText = `Converting: ${videoName}`;
+  uiElements.progressBar.value = progress.percent;
+  uiElements.progressText.innerText = `${progress.percent}%`;
+  uiElements.progressData.innerHTML = `
   <span>Tempo decorrido: ${progress.timemark}</span>
   `;
 });
@@ -140,17 +130,17 @@ ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
 ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   const fileConvertedSpanTag = document.getElementById(videoName);
 
-  UiImports.cancelButton.classList.add("hiden");
-  UiImports.convertButton.classList.remove("hiden");
+  uiElements.cancelButton.classList.add("hiden");
+  uiElements.convertButton.classList.remove("hiden");
 
-  UiImports.progressBar.value = 0;
-  UiImports.progressText.innerHTML = "0%";
-  UiImports.progressVideo.innerText = "";
+  uiElements.progressBar.value = 0;
+  uiElements.progressText.innerHTML = "0%";
+  uiElements.progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
 
   videosOnlistForConvert.shift();
-  UiImports.NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
+  uiElements.NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
 
   addVideosConvertedOnHistory(videoName);
 });
@@ -159,7 +149,6 @@ ipcRenderer.on("conversion-error", (event, videoName, error) => {
   window.alert(`Erro ao converter: ${videoName} erro: ${error}`);
 });
 
-let VideoInfoAnalysisList = [];
 ipcRenderer.on("Videoinfoanalysis-started", (event, videoName) => {
   VideoInfoAnalysisList.push(videoName);
 
@@ -168,7 +157,6 @@ ipcRenderer.on("Videoinfoanalysis-started", (event, videoName) => {
   }
 });
 
-// retorna as infomaçoes dos videos
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
   const item = `
     <div id="${videoName}" class="videoItemList">
@@ -206,12 +194,12 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
       </div>
     </div>`;
 
-  UiImports.convertingList.innerHTML += item;
+  uiElements.convertingList.innerHTML += item;
 });
 
 ipcRenderer.on("video-comrropido", (event, videoName, err) => {
-  UiImports.inputField.value = "";
-  UiImports.convertingList.innerHTML = "";
+  uiElements.inputField.value = "";
+  uiElements.convertingList.innerHTML = "";
 });
 
 async function addVideosConvertedOnHistory(videoName) {
@@ -230,13 +218,25 @@ async function addVideosConvertedOnHistory(videoName) {
       videoHistory.push(doc);
       console.log("Document added successfully", doc);
 
-      LoadHistory(videoHistory);
+      displayHistory(videoHistory);
     }
   });
 }
 
-function LoadHistory(dataArray = [], cb) {
-  UiImports.tablevideo_list.innerHTML = "";
+function loadVideoHistory() {
+  consultarDb((data) => {
+    videoHistory = data.map((element) => element.doc);
+    displayHistory(videoHistory);
+  });
+}
+
+function clearHistory() {
+  deleteDbData();
+  uiElements.tablevideo_list.innerHTML = ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+}
+
+function displayHistory(dataArray = [], cb) {
+  uiElements.tablevideo_list.innerHTML = "";
   if (dataArray.length > 0) {
     for (let i = 0; i < dataArray.length; i++) {
       const item = `<tr>
@@ -245,14 +245,14 @@ function LoadHistory(dataArray = [], cb) {
                         <td class="convertVideoTime">
                         <span class="convertedAt">${dataArray[i].convertedAt}</span></td>
                     </tr>`;
-      UiImports.tablevideo_list.innerHTML += item;
+      uiElements.tablevideo_list.innerHTML += item;
 
       if (dataArray[i] === dataArray.length - 1) {
         cb();
       }
     }
   } else {
-    UiImports.tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
+    uiElements.tablevideo_list.innerHTML += ` <h4>Oops! :/</h4><p>Historico vazio..</p>`;
   }
 }
 
