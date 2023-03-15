@@ -1,10 +1,12 @@
+<div align="center" >
+  <img src="./convertHero.png" width="100px" />
+</div>
 <h1>Conversor de Vídeos em Electron.js usando a biblioteca Fluent-FFmpeg</h1>
-
 <p>Este é um conversor de vídeos desenvolvido em Electron.js que utiliza a biblioteca Fluent-FFmpeg para realizar a conversão de videos.</p>
 <br/>
-<div align="center">
-<img src="screenshots/sreenShot (1).png" width="700px"/>
-<img src="screenshots/sreenShot (2).png" width="700px"/>
+<div align="ledt">
+<img src="screenshots/sreenShot (1).png" width="350px"/>
+<img src="screenshots/sreenShot (2).png" width="350px"/>
 </div>
 <br/>
 <h2>Como usar</h2>
