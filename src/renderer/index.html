@@ -18,6 +18,7 @@
           <label id="labelForinput-file" class="form_item" for="input-file"
             ><i class="fa-solid fa-plus"></i> Adicionar videos...</label
           >
+          <span id="NumberOfvideosOnList"></span>
           <input
             class="form_item"
             type="file"
@@ -26,64 +27,74 @@
             multiple
             required
           />
+        </div>
 
+        <div class="btns-convertion" id="btnsConvertionContainer">
           <select id="output-format">
             <option value="mp4"><span>Converter para MP4</span></option>
             <option value="avi"><span>Converter para AVI</span></option>
             <option value="mov"><span>Converter para MOV</span></option>
           </select>
-        </div>
-
-        <div class="btns-convertion" id="btnsConvertionContainer">
-          <div id="cancelButton" class="form_item hiden">Cancelar</div>
-          <button id="convert-button" class="form_item">
+          <div id="cancelButton" class="form_item hiden btn">Cancelar</div>
+          <button id="convert-button" class="form_item btn">
             <i class="fa-solid fa-rotate-right"></i> Converter
           </button>
         </div>
       </form>
-      <div class="bar">
-        <div class="btns">
-          <span id="convertingbtn" class="currenteVideoList">Convertendo</span>
-          <span id="convertedBtn">Convertidos</span>
-        </div>
-
-        <span id="NumberOfvideosOnList"></span>
-      </div>
     </header>
 
-    <div id="videos_for_converte_Container">
-      <div id="convertingList">
-        <p>
-          Adicione videos para converter clicando no botão acima "Adicionar
-          videos"...
-        </p>
-      </div>
-
-      <div id="convertedList">
-        <h2>Historico de conversão</h2>
-        <table border="0">
-          <tbody id="video-list"></tbody>
-        </table>
-
-        <div class="cleanHistoryBtn_container">
-          <span id="clearHistoryBtn">Clear</span>
+    <section>
+      <div id="videos_for_converte_Container" class="section_item">
+        <div id="convertingList">
+          <p>
+            Adicione videos para converter clicando no botão acima "Adicionar
+            videos"...
+          </p>
         </div>
       </div>
-    </div>
+      <div id="options_Container" class="section_item">
+        <div id="basicConfigs">
+          <span class="titleOption">Configurações basicas</span>
+          <span class="optionConfig">
+            Uso de nucleos do processador:
+            <select id="coresOption">
+              <option value="1"><span>1</span></option>
+              <option value="2"><span>2</span></option>
+            </select></span
+          >
+          <span class="optionConfig">
+            Velocidade de codificação:
+            <select id="SpeedOption">
+              <option value="medium"><span>Medium</span></option>
+              <option value="fast"><span>Fast</span></option>
+              <option value="veryfast"><span>Veryfast</span></option>
+              <option value="superfast"><span>Superfast</span></option>
+              <option value="slow"><span>Slow</span></option>
+              <option value="slower"><span>Slower</span></option>
+            </select>
+          </span>
+          <span class="optionConfig">
+            Qualidade de vídeo:
+            <select id="quality">
+              <option value="22"><span>Media</span></option>
+              <option value="20"><span>Alta</span></option>
+              <option value="18"><span>Maxima</span></option>
+              <option value="26"><span>Baixa</span></option>
+            </select>
+          </span>
+        </div>
+        <div id="videoConfigs"></div>
+      </div>
+    </section>
 
-    <div class="progress-bar_container">
+    <div id="progress-bar_container">
       <p id="progress-video"></p>
       <progress id="progress-bar" value="0" max="100"></progress>
       <p id="progress-text">0%</p>
       <div id="progressData"></div>
     </div>
-
     <script src="./renderer.js"></script>
-    <script>
-      // const videosForConverteContainer =
-      // const convertedList = document.getElementById("convertedList");
-      // const convertingList = document.querySelector("#convertingList");
-
+    <!-- <script>
       const convertingbtn = document.getElementById("convertingbtn");
       const convertedBtn = document.getElementById("convertedBtn");
 
@@ -100,6 +111,6 @@
         convertingList.style.display = "none";
         convertedList.style.display = "block";
       });
-    </script>
+    </script> -->
   </body>
 </html>

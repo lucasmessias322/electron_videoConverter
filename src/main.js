@@ -10,6 +10,7 @@ const {
 } = require("./helpers/format");
 const isDev = require("electron-is-dev");
 
+
 //Get the paths to the packaged versions of the binaries we want to use
 const ffmpegPath = require("ffmpeg-static").replace(
   "app.asar",
@@ -29,7 +30,7 @@ ffmpeg.setFfprobePath(ffprobePath);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1150,
+    width: 1115,
     height: 700,
     minHeight: 700,
     minWidth: 1024,
@@ -107,12 +108,20 @@ ipcMain.handle("select-directory", async (event) => {
   const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
   if (result.canceled) return null;
   return result.filePaths[0];
+  
 });
+
 let conversionProcess = null;
 ipcMain.handle(
   "convert-video",
-  async (event, videoName, inputFile, outputFile, destination) => {
-    await convertVideo(videoName, inputFile, outputFile, destination);
+  async (event, videoName, inputFile, outputFile, destination,outputOptions) => {
+    await convertVideo({
+      videoName,
+      inputFile,
+      outputFile,
+      destination,
+      outputOptions,
+    });
   }
 );
 
@@ -127,19 +136,31 @@ ipcMain.handle("getVideo_information", async (event, videoName, videoPath) => {
   await getVideoInformation(videoName, videoPath);
 });
 
-function convertVideo(videoName, inputFile, outputFile, destination) {
+function convertVideo({
+  videoName,
+  inputFile,
+  outputFile,
+  destination,
+  outputOptions,
+}) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(destination, path.basename(outputFile));
+    const OutputOptions = [
+      { name: "-c:v", value: "libx264" },
+      { name: "-c:a", value: "aac" },
+      { name: "-strict", value: "-2" },
+      { name: "-movflags", value: "faststart" },
+      { name: "-threads", value: outputOptions.coresOption },
+      { name: "-crf", value: outputOptions.quality },
+      { name: "-preset", value: outputOptions.SpeedOption },
+    ];
     let startTime;
     conversionProcess = ffmpeg(inputFile)
       .output(outputPath)
-      .outputOptions("-c:v", "libx264")
-      .outputOptions("-c:a", "aac")
-      .outputOptions("-strict", "-2")
-      .outputOptions("-movflags", "faststart")
-      .outputOptions("-threads", "2")
-      .outputOptions("-crf", "22")
-      .outputOptions("-preset", "fast")
+      .outputOptions(
+        OutputOptions.map((option) => option.name + " " + option.value)
+      )
+
       .on("start", () => {
         mainWindow.webContents.send("conversion-started", videoName);
         startTime = Date.now(); // tempo inicial em milissegundos

@@ -4,7 +4,7 @@
   "description": "Um conversor de videos",
   "main": "./src/main.js",
   "scripts": {
-    "dev": "nodemon --exec electron .",
+    "dev": "npx electronmon .",
     "start": "electron .",
     "build": "electron-builder"
   },
@@ -21,8 +21,7 @@
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2",
-    "moment": "^2.29.4",
-    "pouchdb": "^8.0.1"
+    "moment": "^2.29.4"
   },
   "build": {
     "productName": "ConvertHero",
@@ -44,8 +43,7 @@
     "files": [
       "dist/**/*",
       "package.json",
-      "src",
-      "my_database"
+      "src"
     ],
     "asarUnpack": [
       "node_modules/ffmpeg-static/bin/${os}/${arch}/ffmpeg",

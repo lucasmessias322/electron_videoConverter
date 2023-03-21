@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
-const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
+// const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
 const crypto = require("crypto");
 
 const uiElements = {
@@ -10,6 +10,7 @@ const uiElements = {
   progressBar: document.querySelector("#progress-bar"),
   progressText: document.querySelector("#progress-text"),
   progressVideo: document.querySelector("#progress-video"),
+  progress_bar_container: document.querySelector("#progress-bar_container"),
   convertingList: document.querySelector("#convertingList"),
   tablevideo_list: document.getElementById("video-list"),
   clearHistoryBtn: document.querySelector("#clearHistoryBtn"),
@@ -18,6 +19,9 @@ const uiElements = {
   cancelButton: document.getElementById("cancelButton"),
   progressData: document.getElementById("progressData"),
   btnsConvertionContainer: document.getElementById("btnsConvertionContainer"),
+  coresOption: document.querySelector("#coresOption"),
+  SpeedOption: document.querySelector("#SpeedOption"),
+  quality: document.querySelector("#quality"),
 };
 
 let videosOnlistForConvert = [];
@@ -27,16 +31,18 @@ let outputPath = null;
 let currentConvertion = null;
 
 // Load video history from database and display it in the table
-loadVideoHistory();
+// loadVideoHistory();
 
-uiElements.clearHistoryBtn.addEventListener("click", () => {
-  clearHistory();
-});
+// uiElements.clearHistoryBtn.addEventListener("click", () => {
+//   clearHistory();
+// });
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 uiElements.inputField.addEventListener("change", async () => {
   const inputFiles = uiElements.inputField.files;
+
   uiElements.convertingList.innerHTML = "";
+
   uiElements.NumberOfvideosOnList.innerText = "";
   videosOnlistForConvert = [];
 
@@ -49,7 +55,7 @@ uiElements.inputField.addEventListener("change", async () => {
         inputFiles[i].path
       );
       videosOnlistForConvert.push(inputFiles[i]);
-      uiElements.NumberOfvideosOnList.innerText = `Converter ${i + 1}`;
+      uiElements.NumberOfvideosOnList.innerText = `${i + 1} Videos`;
     } catch (error) {
       console.log(error);
     }
@@ -62,12 +68,22 @@ uiElements.form.addEventListener("submit", async (event) => {
   const inputFiles = uiElements.inputField.files;
   const outputFormat = uiElements.outputFormatField.value;
 
+  //coresOption, SpeedOption, quality
+  let outputOptions = {
+    coresOption: coresOption.value,
+    SpeedOption: SpeedOption.value,
+    quality: quality.value,
+  };
+
   const destination = await ipcRenderer.invoke("select-directory");
   if (!destination) return;
 
   for (let i = 0; i < inputFiles.length; i++) {
     const input = inputFiles[i].path;
-    const output = `${inputFiles[i].name.slice(0, -4)}.${outputFormat}`;
+    const output = `${inputFiles[i].name.slice(
+      0,
+      -4
+    )}_convert_by_ConvertHero.${outputFormat}`;
     outputPath = path.join(destination, output);
     const currentVideo = inputFiles[i].name;
 
@@ -77,7 +93,8 @@ uiElements.form.addEventListener("submit", async (event) => {
         currentVideo,
         input,
         outputPath,
-        destination
+        destination,
+        outputOptions
       );
     } catch (error) {
       console.log(error);
@@ -100,8 +117,9 @@ ipcRenderer.on("conversion-started", (event, videoName) => {
 
 ipcRenderer.on("canceled-video-conversion", (event, videoName) => {
   const divVideoItemListTag = document.getElementById(videoName);
-  uiElements.progressBar.value = 0;
+
   if (divVideoItemListTag) {
+    uiElements.progressBar.value = 0;
     divVideoItemListTag.classList.remove("converting");
     divVideoItemListTag.classList.add("canceledvideoconversion");
   }
@@ -109,6 +127,7 @@ ipcRenderer.on("canceled-video-conversion", (event, videoName) => {
 
 ipcRenderer.on("conversion-progress", (event, videoName, progress) => {
   const divVideoItemListTag = document.getElementById(videoName);
+  uiElements.progress_bar_container.style.display = "flex";
 
   if (divVideoItemListTag) {
     if (progress.percent === 100) {
@@ -138,11 +157,12 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   uiElements.progressVideo.innerText = "";
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
+  uiElements.progress_bar_container.style.display = "none";
 
   videosOnlistForConvert.shift();
-  uiElements.NumberOfvideosOnList.innerText = `Converter ${videosOnlistForConvert.length} videos`;
+  uiElements.NumberOfvideosOnList.innerText = `${videosOnlistForConvert.length} Videos`;
 
-  addVideosConvertedOnHistory(videoName);
+  // addVideosConvertedOnHistory(videoName);
 });
 
 ipcRenderer.on("conversion-error", (event, videoName, error) => {
@@ -158,7 +178,8 @@ ipcRenderer.on("Videoinfoanalysis-started", (event, videoName) => {
 });
 
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
-  const item = `
+  if (videoName && videoInfo) {
+    const item = `
     <div id="${videoName}" class="videoItemList">
       <span class="videoname" id="${videoName}_videoname">
         <b>Nome do video: </b>${videoName}
@@ -194,12 +215,16 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
       </div>
     </div>`;
 
-  uiElements.convertingList.innerHTML += item;
+    uiElements.convertingList.innerHTML += item;
+  }
 });
 
 ipcRenderer.on("video-comrropido", (event, videoName, err) => {
   uiElements.inputField.value = "";
-  uiElements.convertingList.innerHTML = "";
+  uiElements.convertingList.innerHTML = ` <p >
+  Adicione videos para converter clicando no botão acima "Adicionar
+  videos"...
+</p>`;
 });
 
 async function addVideosConvertedOnHistory(videoName) {
