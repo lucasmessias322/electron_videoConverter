@@ -3,13 +3,13 @@ const path = require("path");
 const url = require("url");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
+
 const {
   formatSize,
   formatDuration,
   formatDurationMoment,
 } = require("./helpers/format");
 const isDev = require("electron-is-dev");
-
 
 //Get the paths to the packaged versions of the binaries we want to use
 const ffmpegPath = require("ffmpeg-static").replace(
@@ -108,13 +108,19 @@ ipcMain.handle("select-directory", async (event) => {
   const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
   if (result.canceled) return null;
   return result.filePaths[0];
-  
 });
 
 let conversionProcess = null;
 ipcMain.handle(
   "convert-video",
-  async (event, videoName, inputFile, outputFile, destination,outputOptions) => {
+  async (
+    event,
+    videoName,
+    inputFile,
+    outputFile,
+    destination,
+    outputOptions
+  ) => {
     await convertVideo({
       videoName,
       inputFile,

@@ -183,9 +183,6 @@ section {
       border-top: 0px;
       border-bottom: 0px;
       background-color: #252525;
-    }
-
-    #basicConfigs {
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -203,6 +200,8 @@ section {
         padding: 15px 10px;
         font-size: 14px;
         border-bottom: 1px solid #2e2e2e;
+        display: flex;
+        align-items: center;
 
         select {
           background-color: #252525;
@@ -211,7 +210,16 @@ section {
           border: none;
           outline: none;
         }
+        input {
+          margin-right: 10px;
+        }
       }
+    }
+
+    #basicConfigs {
+      // display: flex;
+      // flex-direction: column;
+      width: 100%;
     }
 
     #videoConfigs {

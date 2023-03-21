@@ -1,7 +1,9 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
-// const { db, consultarDb, deleteDbData } = require("../config/DbConfig");
+const fs = require("fs");
 const crypto = require("crypto");
+const os = require("os");
+const { exec } = require("child_process");
 
 const uiElements = {
   form: document.querySelector("form"),
@@ -22,6 +24,7 @@ const uiElements = {
   coresOption: document.querySelector("#coresOption"),
   SpeedOption: document.querySelector("#SpeedOption"),
   quality: document.querySelector("#quality"),
+  checkboxOpendDir: document.getElementById("checkboxOpendDir"),
 };
 
 let videosOnlistForConvert = [];
@@ -30,12 +33,16 @@ let VideoInfoAnalysisList = [];
 let outputPath = null;
 let currentConvertion = null;
 
-// Load video history from database and display it in the table
-// loadVideoHistory();
+const cpusInfo = os.cpus();
+cpusInfo.map((item, i) => {
+  const thread = i + 1;
 
-// uiElements.clearHistoryBtn.addEventListener("click", () => {
-//   clearHistory();
-// });
+  if (cpusInfo.length === thread) {
+    coresOption.innerHTML += `<option selected value="${thread}"><span>${thread}</span></option>`;
+  } else {
+    coresOption.innerHTML += `<option value="${thread}"><span>${thread}</span></option>`;
+  }
+});
 
 // quando tiver arquivos selecionados no inpute file ele ira exibir no html
 uiElements.inputField.addEventListener("change", async () => {
@@ -44,7 +51,8 @@ uiElements.inputField.addEventListener("change", async () => {
   uiElements.convertingList.innerHTML = "";
 
   uiElements.NumberOfvideosOnList.innerText = "";
-  videosOnlistForConvert = [];
+  // videosOnlistForConvert = [];
+  videosOnlistForConvert = [...inputFiles];
 
   for (let i = 0; i < inputFiles.length; i++) {
     try {
@@ -54,12 +62,19 @@ uiElements.inputField.addEventListener("change", async () => {
         inputFiles[i].name,
         inputFiles[i].path
       );
-      videosOnlistForConvert.push(inputFiles[i]);
+
       uiElements.NumberOfvideosOnList.innerText = `${i + 1} Videos`;
     } catch (error) {
       console.log(error);
     }
   }
+});
+
+uiElements.convertButton.addEventListener("click", () => {
+  const inputFiles = uiElements.inputField.files;
+  videosOnlistForConvert = [...inputFiles];
+  uiElements.NumberOfvideosOnList.innerText = `${videosOnlistForConvert.length} Videos`;
+  console.log(videosOnlistForConvert);
 });
 
 uiElements.form.addEventListener("submit", async (event) => {
@@ -161,6 +176,24 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
 
   videosOnlistForConvert.shift();
   uiElements.NumberOfvideosOnList.innerText = `${videosOnlistForConvert.length} Videos`;
+
+  // Remova a última barra da string
+  const folderPath = outputPath.slice(0, outputPath.lastIndexOf("\\"));
+
+  //Terminou de converter todos os videos.
+  if (videosOnlistForConvert <= 0) {
+    console.log(videosOnlistForConvert);
+    // Executa o comando do sistema operacional para abrir a pasta no explorador de arquivos
+    if (uiElements.checkboxOpendDir.checked) {
+      exec(`start ""  "${folderPath}"`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Erro ao abrir a pasta: ${error}`);
+          return;
+        }
+        console.log(`Pasta aberta com sucesso: ${pastaVideos}`);
+      });
+    }
+  }
 
   // addVideosConvertedOnHistory(videoName);
 });

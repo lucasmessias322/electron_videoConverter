@@ -57,11 +57,16 @@
           <span class="titleOption">Configurações basicas</span>
           <span class="optionConfig">
             Uso de nucleos do processador:
-            <select id="coresOption">
-              <option value="1"><span>1</span></option>
-              <option value="2"><span>2</span></option>
-            </select></span
+            <select id="coresOption"></select
+          ></span>
+
+          <span class="optionConfig"
+            ><input type="checkbox" checked name="" id="checkboxOpendDir" />
+            Abrir pasta apos conversão</span
           >
+        </div>
+        <div id="videoConfigs">
+          <span class="titleOption">Configurações do video</span>
           <span class="optionConfig">
             Velocidade de codificação:
             <select id="SpeedOption">
@@ -83,7 +88,6 @@
             </select>
           </span>
         </div>
-        <div id="videoConfigs"></div>
       </div>
     </section>
 
@@ -94,23 +98,5 @@
       <div id="progressData"></div>
     </div>
     <script src="./renderer.js"></script>
-    <!-- <script>
-      const convertingbtn = document.getElementById("convertingbtn");
-      const convertedBtn = document.getElementById("convertedBtn");
-
-      convertingbtn.addEventListener("click", () => {
-        convertedBtn.classList.remove("currenteVideoList");
-        convertingbtn.classList.add("currenteVideoList");
-        convertedList.style.display = "none";
-        convertingList.style.display = "block";
-      });
-
-      convertedBtn.addEventListener("click", () => {
-        convertingbtn.classList.remove("currenteVideoList");
-        convertedBtn.classList.add("currenteVideoList");
-        convertingList.style.display = "none";
-        convertedList.style.display = "block";
-      });
-    </script> -->
   </body>
 </html>

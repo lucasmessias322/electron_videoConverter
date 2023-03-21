@@ -155,13 +155,11 @@ section #options_Container div {
   border-top: 0px;
   border-bottom: 0px;
   background-color: #252525;
-}
-section #options_Container #basicConfigs {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
-section #options_Container #basicConfigs span.titleOption {
+section #options_Container div span.titleOption {
   background-color: #2e2e2e;
   display: flex;
   align-items: center;
@@ -169,17 +167,25 @@ section #options_Container #basicConfigs span.titleOption {
   font-size: 16px;
   padding: 15px 5px;
 }
-section #options_Container #basicConfigs span.optionConfig {
+section #options_Container div span.optionConfig {
   padding: 15px 10px;
   font-size: 14px;
   border-bottom: 1px solid #2e2e2e;
+  display: flex;
+  align-items: center;
 }
-section #options_Container #basicConfigs span.optionConfig select {
+section #options_Container div span.optionConfig select {
   background-color: #252525;
   font-size: 14px;
   padding: 0px 5px;
   border: none;
   outline: none;
+}
+section #options_Container div span.optionConfig input {
+  margin-right: 10px;
+}
+section #options_Container #basicConfigs {
+  width: 100%;
 }
 section #options_Container #videoConfigs {
   border-top: 5px solid #181818;
