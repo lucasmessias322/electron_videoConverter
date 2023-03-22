@@ -187,6 +187,7 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
   fileConvertedSpanTag.classList.remove("converting");
   fileConvertedSpanTag.classList.add("converted");
   uiElements.progress_bar_container.style.display = "none";
+  uiElements.progressData.innerHTML = "";
 
   videosOnlistForConvert.shift();
   uiElements.NumberOfvideosOnList.innerText = `${videosOnlistForConvert.length} Videos`;
