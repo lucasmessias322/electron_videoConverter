@@ -30,11 +30,11 @@ ffmpeg.setFfprobePath(ffprobePath);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1115,
+    width: 1024,
     height: 700,
     minHeight: 700,
     minWidth: 1024,
-
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -74,6 +74,21 @@ function createWindow() {
   ]);
 
   tray.setContextMenu(trayMenu);
+
+  ipcMain.on("closeWindow", () => {
+    mainWindow.close();
+  });
+
+  ipcMain.on("Windowminimize", () => {
+    mainWindow.minimize();
+  });
+  ipcMain.on("windowFullScreen", () => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.restore();
+    } else {
+      mainWindow.maximize();
+    }
+  });
 }
 
 //Menu template

@@ -25,7 +25,21 @@ const uiElements = {
   SpeedOption: document.querySelector("#SpeedOption"),
   quality: document.querySelector("#quality"),
   checkboxOpendDir: document.getElementById("checkboxOpendDir"),
+  windowMinimize: document.getElementById("windowMinimize"),
+  windowfullScreen: document.getElementById("windowfullScreen"),
+  closeWindowbtn: document.getElementById("closeWindowbtn"),
+  popUpVideoAnalize: document.getElementById("popUpVideoAnalize"),
 };
+
+uiElements.closeWindowbtn.addEventListener("click", () => {
+  ipcRenderer.send("closeWindow");
+});
+uiElements.windowfullScreen.addEventListener("click", () => {
+  ipcRenderer.send("windowFullScreen");
+});
+uiElements.windowMinimize.addEventListener("click", () => {
+  ipcRenderer.send("Windowminimize");
+});
 
 let videosOnlistForConvert = [];
 let videoHistory = [];
@@ -194,8 +208,6 @@ ipcRenderer.on("conversion-complete", (event, videoName, outputPath) => {
       });
     }
   }
-
-  // addVideosConvertedOnHistory(videoName);
 });
 
 ipcRenderer.on("conversion-error", (event, videoName, error) => {
@@ -206,12 +218,13 @@ ipcRenderer.on("Videoinfoanalysis-started", (event, videoName) => {
   VideoInfoAnalysisList.push(videoName);
 
   if (VideoInfoAnalysisList.length <= 1) {
-    window.alert("Analizando informaçoes dos videos");
+    uiElements.popUpVideoAnalize.style.display = "flex";
   }
 });
 
 ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
   if (videoName && videoInfo) {
+    uiElements.popUpVideoAnalize.style.display = "none";
     const item = `
     <div id="${videoName}" class="videoItemList">
       <span class="videoname" id="${videoName}_videoname">
