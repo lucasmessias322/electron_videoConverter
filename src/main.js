@@ -30,7 +30,7 @@ ffmpeg.setFfprobePath(ffprobePath);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1024,
+    width: 1200,
     height: 700,
     minHeight: 700,
     minWidth: 1024,
@@ -236,6 +236,16 @@ function convertVideo({
 async function getVideoInformation(videoName, videoPath) {
   mainWindow.webContents.send("Videoinfoanalysis-started", videoName);
 
+  const tempdir = path.resolve(__dirname, "..", "temp");
+  const thumbsDir = path.resolve(__dirname, "..", "temp", "thumbnails");
+
+  if (!fs.existsSync(tempdir)) {
+    fs.mkdirSync(tempdir);
+  }
+  if (!fs.existsSync(tempdir)) {
+    fs.mkdirSync(thumbsDir);
+  }
+
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
@@ -252,21 +262,36 @@ async function getVideoInformation(videoName, videoPath) {
       const size = formatSize(metadata.format.size);
       const format = metadata.format.format_long_name;
 
-      resolve({
-        duration,
-        codecs,
-        resolution,
-        format,
-        size,
-      });
+      const imageOutputPath = `${thumbsDir}/${videoName}-thumbnail.png`;
+      const command = ffmpeg(videoPath)
+        .screenshots({
+          count: 1,
+          folder: thumbsDir,
+          filename: `${videoName}-thumbnail.png`,
+          size: "320x240",
+        })
+        .on("end", () => {
+          resolve({
+            duration,
+            codecs,
+            resolution,
+            format,
+            size,
+            image: `${imageOutputPath}`,
+          });
 
-      mainWindow.webContents.send("videoInformation-ready", videoName, {
-        duration,
-        codecs,
-        resolution,
-        format,
-        size,
-      });
+          mainWindow.webContents.send("videoInformation-ready", videoName, {
+            duration,
+            codecs,
+            resolution,
+            format,
+            size,
+            image: `${imageOutputPath}`,
+          });
+        })
+        .on("error", (err) => {
+          reject(err);
+        });
     });
   });
 }

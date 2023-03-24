@@ -19,7 +19,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #181818;
-  border: 2px solid #181818;
+  border: 2px solid #1d1d1d;
 }
 
 header {
@@ -29,7 +29,7 @@ header {
 }
 header div.windowoptions {
   height: 35px;
-  background-color: #181818;
+  background-color: #1d1d1d;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -147,7 +147,7 @@ section #popUpVideoAnalize {
   align-items: center;
 }
 section #popUpVideoAnalize div.popUp {
-  width: 400px;
+  width: 500px;
   background-color: #181818;
   padding: 50px 30px;
   display: flex;
@@ -166,7 +166,7 @@ section #popUpVideoAnalize div.popUp img {
 }
 section #videos_for_converte_Container {
   width: 70%;
-  height: 70vh;
+  height: 75vh;
   background-color: #252525;
 }
 section #videos_for_converte_Container #convertingList {
@@ -184,15 +184,31 @@ section #videos_for_converte_Container #convertingList div.videoItemList {
   border-bottom: 1px solid #2e2e2e;
   margin-bottom: 5px;
   display: flex;
-  flex-direction: column;
-  padding: 20px;
+  align-items: center;
+  padding: 20px 5px;
 }
-section #videos_for_converte_Container #convertingList div.videoItemList div.video_source {
+section #videos_for_converte_Container #convertingList div.videoItemList img {
+  width: 100px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border: 1px solid white;
+}
+section #videos_for_converte_Container #convertingList div.videoItemList div.container {
+  padding-left: 10px;
+}
+section #videos_for_converte_Container #convertingList div.videoItemList div.container span.videoname {
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 90%;
+}
+section #videos_for_converte_Container #convertingList div.videoItemList div.container div.video_source {
   background-color: #181818;
-  width: 70%;
+  width: 90%;
   margin-top: 10px;
 }
-section #videos_for_converte_Container #convertingList div.videoItemList div.video_source ul {
+section #videos_for_converte_Container #convertingList div.videoItemList div.container div.video_source ul {
   list-style: none;
   display: flex;
   flex-direction: row;
@@ -200,10 +216,7 @@ section #videos_for_converte_Container #convertingList div.videoItemList div.vid
   justify-content: space-between;
   padding: 10px;
 }
-section #videos_for_converte_Container #convertingList div.videoItemList div.video_source ul li {
-  margin: 5px 10px;
-}
-section #videos_for_converte_Container #convertingList div.videoItemList div.video_source ul li span {
+section #videos_for_converte_Container #convertingList div.videoItemList div.container div.video_source ul li span {
   font-size: 14px;
 }
 section #videos_for_converte_Container #convertingList div.converting {
@@ -212,18 +225,16 @@ section #videos_for_converte_Container #convertingList div.converting {
 section #videos_for_converte_Container #convertingList div.converting div.video_source {
   background-color: #43009b;
 }
-section #videos_for_converte_Container #convertingList div.converted {
-  background-color: #252525;
-}
 section #videos_for_converte_Container #convertingList div.canceledvideoconversion {
   background-color: rgba(255, 66, 66, 0.082);
 }
 section #options_Container {
   width: 30%;
+  height: 75vh;
   background-color: #252525;
 }
 section #options_Container div {
-  height: 35vh;
+  height: 37.5vh;
   border-left: 5px solid #181818;
   border-top: 0px;
   border-bottom: 0px;

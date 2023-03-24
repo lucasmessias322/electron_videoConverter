@@ -4,7 +4,8 @@
   "description": "Um conversor de videos",
   "main": "./src/main.js",
   "scripts": {
-    "dev": "npx electronmon .",
+    "devnodemon": "nodemon --watch ./src/* --exec electron .",
+    "develectron": "npx electronmon .",
     "start": "electron .",
     "build": "electron-builder"
   },
