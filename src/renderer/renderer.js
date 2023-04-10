@@ -30,15 +30,15 @@ const uiElements = {
   popUpVideoAnalize: document.getElementById("popUpVideoAnalize"),
 };
 
-uiElements.closeWindowbtn.addEventListener("click", () => {
-  ipcRenderer.send("closeWindow");
-});
-uiElements.windowfullScreen.addEventListener("click", () => {
-  ipcRenderer.send("windowFullScreen");
-});
-uiElements.windowMinimize.addEventListener("click", () => {
-  ipcRenderer.send("Windowminimize");
-});
+// uiElements.closeWindowbtn.addEventListener("click", () => {
+//   ipcRenderer.send("closeWindow");
+// });
+// uiElements.windowfullScreen.addEventListener("click", () => {
+//   ipcRenderer.send("windowFullScreen");
+// });
+// uiElements.windowMinimize.addEventListener("click", () => {
+//   ipcRenderer.send("Windowminimize");
+// });
 
 let videosOnlistForConvert = [];
 let VideoInfoAnalysisList = [];
@@ -66,7 +66,11 @@ uiElements.inputField.addEventListener("change", async () => {
     uiElements.NumberOfvideosOnList.innerText = "";
   }
 
-  const thumbsDir = path.resolve(__dirname, "..", "..", "temp", "thumbnails");
+  const thumbsDir = path.resolve(
+    "./",
+    "convertHero_tempfiles",
+    "thumbnails"
+  );
 
   //Apaga as thumbnails do diretorio thumbs
   if (fs.existsSync(thumbsDir)) {
@@ -95,6 +99,7 @@ uiElements.inputField.addEventListener("change", async () => {
         videosOnlistForConvert[i].name,
         videosOnlistForConvert[i].path
       );
+      console.log(i);
 
       uiElements.NumberOfvideosOnList.innerText = `${videosOnlistForConvert.length} Videos`;
     } catch (error) {
@@ -251,7 +256,7 @@ ipcRenderer.on("videoInformation-ready", (event, videoName, videoInfo) => {
             <li>
             <span class="icon"><i class="fa-solid fa-film"></i> </span>
             <span class="videoInfo" >
-               ${videoName.substring(elem.videoName.length - 3)}
+               ${elem.videoName.substring(elem.videoName.length - 3)}
             </span>
             </li>
             <li>

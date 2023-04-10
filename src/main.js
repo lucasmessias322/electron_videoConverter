@@ -34,7 +34,6 @@ function createWindow() {
     height: 700,
     minHeight: 700,
     minWidth: 1024,
-    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -45,6 +44,8 @@ function createWindow() {
     title: "ConvertHero",
     icon: iconPc,
   });
+
+  mainWindow.setMenu(null)
 
   if (isDev) {
     mainWindow.webContents.openDevTools();
@@ -103,8 +104,8 @@ app.whenReady().then(() => {
   createWindow();
 
   //Implement menu
-  const mainMenu = Menu.buildFromTemplate(menu);
-  Menu.setApplicationMenu(mainMenu);
+  // const mainMenu = Menu.buildFromTemplate(menu);
+  // Menu.setApplicationMenu(mainMenu);
 
   app.on("activate", () => {
     if (mainWindow === null) {
@@ -236,8 +237,8 @@ function convertVideo({
 async function getVideoInformation(videoName, videoPath) {
   mainWindow.webContents.send("Videoinfoanalysis-started", videoName);
 
-  const tempdir = path.resolve(__dirname, "..", "temp");
-  const thumbsDir = path.resolve(__dirname, "..", "temp", "thumbnails");
+  const tempdir = path.resolve("./", "convertHero_tempfiles");
+  const thumbsDir = path.resolve("./", "convertHero_tempfiles", "thumbnails");
 
   if (!fs.existsSync(tempdir)) {
     fs.mkdirSync(tempdir);

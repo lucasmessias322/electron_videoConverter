@@ -38,34 +38,34 @@ header {
   position: fixed;
   width: 100%;
 
-  div.windowoptions {
-    height: 35px;
-    background-color: #1d1d1d;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    -webkit-app-region: drag;
+  // div.windowoptions {
+  //   height: 35px;
+  //   background-color: #1d1d1d;
+  //   width: 100%;
+  //   display: flex;
+  //   justify-content: space-between;
+  //   -webkit-app-region: drag;
 
-    div.side {
-      display: flex;
-      align-items: center;
+  //   div.side {
+  //     display: flex;
+  //     align-items: center;
 
-      span {
-        padding: 5px 15px;
-        -webkit-app-region: no-drag;
-        cursor: pointer;
+  //     span {
+  //       padding: 5px 15px;
+  //       -webkit-app-region: no-drag;
+  //       cursor: pointer;
 
-        img {
-          width: 20px;
-          object-fit: contain;
-        }
+  //       img {
+  //         width: 20px;
+  //         object-fit: contain;
+  //       }
 
-        &:hover {
-          background-color: $color-button;
-        }
-      }
-    }
-  }
+  //       &:hover {
+  //         background-color: $color-button;
+  //       }
+  //     }
+  //   }
+  // }
 
   form {
     padding: 10px 10px;
@@ -153,13 +153,13 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 110px;
+  padding-top: 75px;
   border-top: 5px solid #181818;
 
   #popUpVideoAnalize {
     position: fixed;
     width: 100%;
-    height: 95vh;
+    height: 100vh;
     bottom: 0;
     background-color: #000000b4;
     display: none;
