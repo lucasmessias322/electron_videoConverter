@@ -4,14 +4,13 @@ import { FaFileVideo } from "react-icons/fa";
 import { VscChromeClose } from "react-icons/vsc";
 import WindowControls from "./Components/WindowControls";
 import ConfigurationSidebar from "./Components/ConfigurationSidebar";
+import ProgressBar from "./Components/ProgressBar";
+
 type VideoItem = {
   file: File;
   converted: boolean;
 };
 function App() {
-  const [isSection1Open, setIsSection1Open] = useState(true);
-  const [isSection2Open, setIsSection2Open] = useState(true);
-
   const [outputFolder, setOutputFolder] = useState<string>("");
 
   // Estados das configs básicas
@@ -163,7 +162,6 @@ function App() {
                     <div className="VideoThumb">
                       <FaFileVideo size={28} color="#7b2cbf" />
                     </div>
-
                     <div className="videoInfos">
                       <span className="videoname">{video.name}</span>
                     </div>
@@ -180,10 +178,6 @@ function App() {
         </VideosContainer>
 
         <ConfigurationSidebar
-          isSection1Open={isSection1Open}
-          setIsSection1Open={setIsSection1Open}
-          isSection2Open={isSection2Open}
-          setIsSection2Open={setIsSection2Open}
           format={format}
           setFormat={setFormat}
           quality={quality}
@@ -201,17 +195,7 @@ function App() {
           setUseHardwareAcceleration={setUseHardwareAcceleration}
         />
       </MainContent>
-      {progress && (
-        <ProgressContainer>
-          <ProgressBar>
-            <span>
-              Converting: <strong>{progress.file.split(/[/\\]/).pop()}</strong>
-            </span>
-            <progress value={progress.percent} max={100}></progress>
-            <span>{progress.percent}%</span>
-          </ProgressBar>
-        </ProgressContainer>
-      )}
+      {progress && <ProgressBar progress={progress} />}
     </Container>
   );
 }
@@ -361,43 +345,43 @@ const IconButton = styled.button`
   }
 `;
 
-const ProgressContainer = styled.div`
-  background-color: #202020;
-  padding: 16px 40px;
-  border-top: 2px solid #181818;
-  flex-shrink: 0; /* 👈 Isso impede que ele cresça e empurre o conteúdo */
-`;
+// const ProgressContainer = styled.div`
+//   background-color: #202020;
+//   padding: 16px 40px;
+//   border-top: 2px solid #181818;
+//   flex-shrink: 0; /* 👈 Isso impede que ele cresça e empurre o conteúdo */
+// `;
 
-const ProgressBar = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+// const ProgressBar = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   gap: 10px;
 
-  span {
-    font-size: 14px;
-    color: #a0a0a0;
-  }
+//   span {
+//     font-size: 14px;
+//     color: #a0a0a0;
+//   }
 
-  progress {
-    width: 100%;
-    appearance: none;
-    height: 2px;
-    border-radius: 0px;
-    overflow: hidden;
+//   progress {
+//     width: 100%;
+//     appearance: none;
+//     height: 2px;
+//     border-radius: 0px;
+//     overflow: hidden;
 
-    &::-webkit-progress-bar {
-      background-color: #2a2a2a;
-      border-radius: 0px;
-    }
+//     &::-webkit-progress-bar {
+//       background-color: #2a2a2a;
+//       border-radius: 0px;
+//     }
 
-    &::-webkit-progress-value {
-      background-color: #8c00ff;
-      border-radius: 0px;
-    }
+//     &::-webkit-progress-value {
+//       background-color: #8c00ff;
+//       border-radius: 0px;
+//     }
 
-    &::-moz-progress-bar {
-      background-color: #8c00ff;
-      border-radius: 0px;
-    }
-  }
-`;
+//     &::-moz-progress-bar {
+//       background-color: #8c00ff;
+//       border-radius: 0px;
+//     }
+//   }
+// `;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { MdArrowRight } from "react-icons/md"; // Corrigido
 
@@ -32,10 +32,7 @@ interface ConfigurationSidebarProps {
 }
 
 function ConfigurationSidebar({
-  isSection1Open,
-  setIsSection1Open,
-  isSection2Open,
-  setIsSection2Open,
+ 
   format,
   setFormat,
   quality,
@@ -52,6 +49,9 @@ function ConfigurationSidebar({
   useHardwareAcceleration,
   setUseHardwareAcceleration,
 }: ConfigurationSidebarProps) {
+  const [isSection1Open, setIsSection1Open] = useState(true);
+    const [isSection2Open, setIsSection2Open] = useState(true);
+  
   return (
     <Sidebar>
       {/* Video Settings */}
