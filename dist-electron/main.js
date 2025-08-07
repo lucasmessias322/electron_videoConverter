@@ -3395,7 +3395,7 @@ function createWindow() {
     height: 700,
     minHeight: 700,
     minWidth: 1024,
-    frame: false,
+    frame: true,
     // <- remove barra nativa
     //titleBarStyle: "hidden",
     webPreferences: {
@@ -3465,6 +3465,11 @@ electron.ipcMain.handle("convert-videos", async (_, payload) => {
   if (!Array.isArray(files) || files.length === 0) {
     throw new Error("Nenhum arquivo recebido.");
   }
+  const resolutionMap = {
+    "1080p": "1920x1080",
+    "720p": "1280x720",
+    "480p": "854x480"
+  };
   const convertedPaths = [];
   for (const filePath of files) {
     const parsedPath = path$2.parse(filePath);
@@ -3480,6 +3485,15 @@ electron.ipcMain.handle("convert-videos", async (_, payload) => {
       outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
       outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
     }
+    if (quality !== "original") {
+      const resolution = resolutionMap[quality];
+      if (resolution) {
+        outputOptions.push(`-vf scale=${resolution}`);
+      }
+    }
+    win == null ? void 0 : win.webContents.send("conversion-started", {
+      file: filePath
+    });
     await new Promise((resolve, reject) => {
       ffmpeg(filePath).outputOptions(outputOptions).on("start", (commandLine) => {
         console.log("FFmpeg command:", commandLine);
@@ -3491,6 +3505,7 @@ electron.ipcMain.handle("convert-videos", async (_, payload) => {
         });
       }).on("end", () => {
         console.log(`✅ Convertido: ${outputPath}`);
+        win == null ? void 0 : win.webContents.send("conversion-completed", { file: filePath });
         convertedPaths.push(outputPath);
         resolve();
       }).on("error", (err) => {

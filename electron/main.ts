@@ -28,7 +28,7 @@ function createWindow() {
     height: 700,
     minHeight: 700,
     minWidth: 1024,
-    frame: false, // <- remove barra nativa
+    frame: true, // <- remove barra nativa
     //titleBarStyle: "hidden",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -114,6 +114,12 @@ ipcMain.handle("convert-videos", async (_, payload) => {
     throw new Error("Nenhum arquivo recebido.");
   }
 
+  const resolutionMap: Record<string, string> = {
+    "1080p": "1920x1080",
+    "720p": "1280x720",
+    "480p": "854x480",
+  };
+
   const convertedPaths: string[] = [];
 
   for (const filePath of files) {
@@ -133,6 +139,20 @@ ipcMain.handle("convert-videos", async (_, payload) => {
       outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
       outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
     }
+
+    // ✅ Adiciona filtro de escala apenas se necessário
+    if (quality !== "original") {
+      const resolution = resolutionMap[quality];
+      if (resolution) {
+        outputOptions.push(`-vf scale=${resolution}`);
+      }
+    }
+
+    // 🔔 Envia ao renderer que este vídeo está começando a conversão
+    win?.webContents.send("conversion-started", {
+      file: filePath,
+    });
+
     await new Promise<void>((resolve, reject) => {
       ffmpeg(filePath)
         .outputOptions(outputOptions)
@@ -151,6 +171,8 @@ ipcMain.handle("convert-videos", async (_, payload) => {
 
         .on("end", () => {
           console.log(`✅ Convertido: ${outputPath}`);
+          win?.webContents.send("conversion-completed", { file: filePath });
+
           convertedPaths.push(outputPath);
           resolve();
         })
@@ -186,4 +208,7 @@ ipcMain.handle("select-output-folder", async () => {
 ipcMain.handle("getCpuCores", () => {
   return os.cpus().length;
 });
+
+
+
 app.whenReady().then(createWindow);

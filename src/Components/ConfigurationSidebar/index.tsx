@@ -32,7 +32,6 @@ interface ConfigurationSidebarProps {
 }
 
 function ConfigurationSidebar({
- 
   format,
   setFormat,
   quality,
@@ -50,8 +49,8 @@ function ConfigurationSidebar({
   setUseHardwareAcceleration,
 }: ConfigurationSidebarProps) {
   const [isSection1Open, setIsSection1Open] = useState(true);
-    const [isSection2Open, setIsSection2Open] = useState(true);
-  
+  const [isSection2Open, setIsSection2Open] = useState(true);
+
   return (
     <Sidebar>
       {/* Video Settings */}
@@ -82,6 +81,8 @@ function ConfigurationSidebar({
                 value={quality}
                 onChange={(e) => setQuality(e.target.value)}
               >
+                {" "}
+                <option value="original">Original</option>
                 <option value="1080p">1080p</option>
                 <option value="720p">720p</option>
                 <option value="480p">480p</option>
@@ -178,8 +179,8 @@ function ConfigurationSidebar({
                 <input
                   type="checkbox"
                   id="hardwareAcceleration"
-                  checked={useHardwareAcceleration}
-                  onChange={() => setUseHardwareAcceleration((prev) => !prev)}
+                  checked={useHardwareAcceleration} // ← controle direto via estado
+    onChange={(e) => setUseHardwareAcceleration(e.target.checked)}
                 />
                 <Label htmlFor="hardwareAcceleration">
                   Usar Aceleração de hardware
@@ -281,7 +282,7 @@ const Label = styled.label`
 `;
 
 const Button = styled.button`
-  background-color: #7b2cbf;
+  background-color: #562383;
   color: white;
   border: none;
   border-radius: 6px;

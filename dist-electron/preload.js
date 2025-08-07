@@ -3,6 +3,8 @@ const electron = require("electron");
 electron.contextBridge.exposeInMainWorld("electronAPI", {
   convertVideos: (options) => electron.ipcRenderer.invoke("convert-videos", options),
   onProgress: (callback) => electron.ipcRenderer.on("conversion-progress", (_event, data) => callback(data)),
+  onConversionStarted: (callback) => electron.ipcRenderer.on("conversion-started", (_event, data) => callback(data)),
+  onConversionCompleted: (callback) => electron.ipcRenderer.on("conversion-completed", (_event, data) => callback(data)),
   selectOutputFolder: () => electron.ipcRenderer.invoke("select-output-folder"),
   windowControl: (action) => electron.ipcRenderer.send("window-control", action),
   getCpuCores: () => electron.ipcRenderer.invoke("getCpuCores")
