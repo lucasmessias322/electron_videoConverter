@@ -7,8 +7,10 @@ import WindowControls from "./Components/WindowControls";
 import ConfigurationSidebar from "./Components/ConfigurationSidebar";
 import ProgressBar from "./Components/ProgressBar";
 
+type FileWithPath = File & { path: string };
+
 type VideoItem = {
-  file: File;
+  file: FileWithPath;
   path: string;
   name: string;
   converting: boolean;

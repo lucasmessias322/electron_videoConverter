@@ -107,7 +107,7 @@ function ConfigurationSidebar({
                 <Button
                   onClick={async () => {
                     const folder =
-                      await window.electronAPI.selectOutputFolder();
+                      await window.electronAPI?.selectOutputFolder();
                     if (folder) setOutputFolder(folder);
                   }}
                 >
