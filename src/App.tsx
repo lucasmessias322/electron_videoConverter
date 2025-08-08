@@ -210,7 +210,15 @@ function App() {
 
   return (
     <Container>
-      <WindowControls />
+      <WindowControls
+        cpuCores={cpuCores}
+        setCpuCores={setCpuCores}
+        maxCpuCores={maxCpuCores}
+        openFolder={openFolder}
+        setOpenFolder={setOpenFolder}
+        useHardwareAcceleration={useHardwareAcceleration}
+        setUseHardwareAcceleration={setUseHardwareAcceleration}
+      />
 
       <Header>
         <div className="Left" />
@@ -272,15 +280,8 @@ function App() {
           setQuality={setQuality}
           speed={speed}
           setSpeed={setSpeed}
-          cpuCores={cpuCores}
-          setCpuCores={setCpuCores}
-          maxCpuCores={maxCpuCores}
           outputFolder={outputFolder}
           setOutputFolder={setOutputFolder}
-          openFolder={openFolder}
-          setOpenFolder={setOpenFolder}
-          useHardwareAcceleration={useHardwareAcceleration}
-          setUseHardwareAcceleration={setUseHardwareAcceleration}
         />
       </MainContent>
 

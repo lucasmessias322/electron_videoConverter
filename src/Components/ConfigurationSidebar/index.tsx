@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { MdArrowRight } from "react-icons/md"; // Corrigido
 
-interface ConfigurationSidebarProps {
+export interface ConfigurationSidebarProps {
   isSection1Open: boolean;
   setIsSection1Open: React.Dispatch<React.SetStateAction<boolean>>;
   isSection2Open: boolean;
@@ -62,45 +62,6 @@ function ConfigurationSidebar({
         {isSection2Open && (
           <SectionContent isOpen={isSection2Open}>
             <FormGroup>
-              <Label htmlFor="format">Formato:</Label>
-              <Select
-                id="format"
-                value={format}
-                onChange={(e) => setFormat(e.target.value)}
-              >
-                <option value="mp4">MP4</option>
-                <option value="mkv">MKV</option>
-                <option value="avi">AVI</option>
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <Label htmlFor="quality">Qualidade:</Label>
-              <Select
-                id="quality"
-                value={quality}
-                onChange={(e) => setQuality(e.target.value)}
-              >
-                {" "}
-                <option value="original">Original</option>
-                <option value="1080p">1080p</option>
-                <option value="720p">720p</option>
-                <option value="480p">480p</option>
-              </Select>
-            </FormGroup>
-          </SectionContent>
-        )}
-      </ConfigSection>
-
-      {/* Basic Settings */}
-      <ConfigSection isOpen={isSection1Open}>
-        <ConfigType onClick={() => setIsSection1Open((prev) => !prev)}>
-          <h2>Basic Settings</h2>
-          <MdArrowRight size={25} />
-        </ConfigType>
-        {isSection1Open && (
-          <SectionContent isOpen={isSection1Open}>
-            <FormGroup>
               <div
                 style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
@@ -127,21 +88,33 @@ function ConfigurationSidebar({
                 </span>
               </div>
             </FormGroup>
-
             <FormGroup>
-              <CheckboxContainer>
-                <input
-                  type="checkbox"
-                  id="openFolderCheckbox"
-                  checked={openFolder}
-                  onChange={() => setOpenFolder((prev) => !prev)}
-                />
-                <Label htmlFor="openFolderCheckbox">
-                  Abrir pasta após conversão
-                </Label>
-              </CheckboxContainer>
+              <Label htmlFor="format">Formato:</Label>
+              <Select
+                id="format"
+                value={format}
+                onChange={(e) => setFormat(e.target.value)}
+              >
+                <option value="mp4">MP4</option>
+                <option value="mkv">MKV</option>
+                <option value="avi">AVI</option>
+              </Select>
             </FormGroup>
 
+            <FormGroup>
+              <Label htmlFor="quality">Qualidade:</Label>
+              <Select
+                id="quality"
+                value={quality}
+                onChange={(e) => setQuality(e.target.value)}
+              >
+                {" "}
+                <option value="original">Original</option>
+                <option value="1080p">1080p</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+              </Select>
+            </FormGroup>
             <FormGroup>
               <Label htmlFor="speedBasic">Velocidade de codificação:</Label>
               <Select
@@ -156,40 +129,12 @@ function ConfigurationSidebar({
                 <option value="veryslow">veryslow</option>
               </Select>
             </FormGroup>
-
-            <FormGroup>
-              <Label htmlFor="cpuCoresBasic">Uso de núcleos da CPU:</Label>
-              <Select
-                id="cpuCoresBasic"
-                value={cpuCores}
-                onChange={(e) => setCpuCores(parseInt(e.target.value, 10) || 1)}
-              >
-                {Array.from({ length: maxCpuCores }, (_, i) => i + 1).map(
-                  (n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  )
-                )}
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <CheckboxContainer>
-                <input
-                  type="checkbox"
-                  id="hardwareAcceleration"
-                  checked={useHardwareAcceleration} // ← controle direto via estado
-    onChange={(e) => setUseHardwareAcceleration(e.target.checked)}
-                />
-                <Label htmlFor="hardwareAcceleration">
-                  Usar Aceleração de hardware
-                </Label>
-              </CheckboxContainer>
-            </FormGroup>
           </SectionContent>
         )}
       </ConfigSection>
+
+    
+
     </Sidebar>
   );
 }
