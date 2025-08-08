@@ -15,6 +15,7 @@ type VideoItem = {
   name: string;
   converting: boolean;
   converted: boolean;
+  thumbnail?: string; // ← thumbnail opcional
 };
 
 function App() {
@@ -48,33 +49,85 @@ function App() {
   // ⬇️ Funções de manipulação de arquivos
   const handleAddClick = () => fileInputRef.current?.click();
 
-  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (!files) return;
+
+  //   const fileArray = Array.from(files).map((file) => ({
+  //     file,
+  //     path: (file as any).path,
+  //     name: file.name,
+  //     converting: false,
+  //     converted: false,
+  //   }));
+
+  //   setVideosToConvert((prev) => [...prev, ...fileArray]);
+  //   e.target.value = "";
+  // };
+  const handleFilesSelected = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = e.target.files;
     if (!files) return;
 
-    const fileArray = Array.from(files).map((file) => ({
-      file,
-      path: (file as any).path,
-      name: file.name,
-      converting: false,
-      converted: false,
-    }));
+    const fileArray = await Promise.all(
+      Array.from(files).map(async (file) => {
+        const path = (file as any).path;
+        const thumbnail = await window.electronAPI
+          .generateThumbnail(path)
+          .catch(() => undefined);
+
+        return {
+          file,
+          path,
+          name: file.name,
+          converting: false,
+          converted: false,
+          thumbnail,
+        };
+      })
+    );
 
     setVideosToConvert((prev) => [...prev, ...fileArray]);
     e.target.value = "";
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  // const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  //   e.preventDefault();
+  //   setIsDragging(false);
+
+  //   const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
+  //     file,
+  //     path: (file as any).path,
+  //     name: file.name,
+  //     converting: false,
+  //     converted: false,
+  //   }));
+
+  //   setVideosToConvert((prev) => [...prev, ...droppedFiles]);
+  // };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
 
-    const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
-      file,
-      path: (file as any).path,
-      name: file.name,
-      converting: false,
-      converted: false,
-    }));
+    const droppedFiles = await Promise.all(
+      Array.from(e.dataTransfer.files).map(async (file) => {
+        const path = (file as any).path;
+        const thumbnail = await window.electronAPI
+          .generateThumbnail(path)
+          .catch(() => undefined);
+
+        return {
+          file,
+          path,
+          name: file.name,
+          converting: false,
+          converted: false,
+          thumbnail,
+        };
+      })
+    );
 
     setVideosToConvert((prev) => [...prev, ...droppedFiles]);
   };
@@ -90,6 +143,13 @@ function App() {
   };
 
   const handleRemoveVideo = (index: number) => {
+    const removed = videosToConvert[index];
+
+    // Deleta a thumbnail do sistema de arquivos
+    if (removed.thumbnail) {
+      window.electronAPI.deleteFile?.(removed.thumbnail);
+    }
+
     setVideosToConvert((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -253,10 +313,17 @@ function App() {
               {videosToConvert.map((video, idx) => (
                 <VideoItem key={idx} isConverting={video.converting}>
                   <LeftSide>
-                    <div className="VideoThumb">
-                      <FaFileVideo size={28} color="#7b2cbf" />
-                    </div>
                     <div className="videoInfos">
+                      <div className="VideoThumb">
+                        {video.thumbnail ? (
+                          <img
+                            src={`file://${video.thumbnail}`}
+                            alt="Thumbnail"
+                          />
+                        ) : (
+                          <FaFileVideo size={28} color="#7b2cbf" />
+                        )}
+                      </div>
                       <span className="videoname">{video.name}</span>
                       {video.converting && <span> Convertendo...</span>}
                       {video.converted && <span>✅ Convertido</span>}
@@ -402,7 +469,21 @@ const LeftSide = styled.div`
   align-items: center;
   gap: 12px;
 
+  .VideoThumb {
+    img {
+      width: 150px;
+      height: 100px;
+      border-radius: 8px;
+      border: 1px solid #7b2cbf;
+      object-fit: cover;
+    }
+  }
+
   .videoInfos {
+    display: flex;
+    gap: 10px;
+
+    //align-items: center;
     .videoname {
       font-size: 15px;
       color: #e0e0e0;

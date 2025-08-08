@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   selectOutputFolder: () => ipcRenderer.invoke("select-output-folder"),
   windowControl: (action: any) => ipcRenderer.send("window-control", action),
   getCpuCores: () => ipcRenderer.invoke("getCpuCores"),
+ generateThumbnail: (videoPath: string) =>
+    ipcRenderer.invoke("generate-thumbnail", videoPath),
+  deleteFile: (filePath: string) => ipcRenderer.invoke("delete-file", filePath),
 });
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
