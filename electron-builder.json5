@@ -4,6 +4,7 @@
   "appId": "YourAppID",
   "asar": true,
   "productName": "ConvertHero",
+
   "directories": {
     "output": "release/${version}"
   },
@@ -27,7 +28,8 @@
       }
     ],
    
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}",
+    "icon": "src/assets/icon.ico"
   },
   "nsis": {
     "oneClick": false,

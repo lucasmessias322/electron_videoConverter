@@ -86,12 +86,7 @@ function WindowControls({
               >
                 Geral
               </SidebarItem>
-              <SidebarItem
-                onClick={() => setActiveTab("interface")}
-                $active={activeTab === "interface"}
-              >
-                Interface
-              </SidebarItem>
+             
               <SidebarItem
                 onClick={() => setActiveTab("avancado")}
                 $active={activeTab === "avancado"}
@@ -119,12 +114,7 @@ function WindowControls({
                   </FormGroup>
                 </>
               )}
-              {activeTab === "interface" && (
-                <>
-                  <h2>Configurações de Interface</h2>
-                  <p>Personalize o tema, layout e aparência da interface.</p>
-                </>
-              )}
+           
               {activeTab === "avancado" && (
                 <>
                   <h2>Configurações Avançadas</h2>

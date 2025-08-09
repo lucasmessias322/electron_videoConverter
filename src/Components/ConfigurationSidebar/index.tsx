@@ -98,6 +98,10 @@ function ConfigurationSidebar({
                 <option value="mp4">MP4</option>
                 <option value="mkv">MKV</option>
                 <option value="avi">AVI</option>
+                <option value="mov">MOV</option>
+                <option value="flv">FLV</option>{" "}
+                <option value="mpeg">MPEG</option>
+                <option value="webm">WebM</option>
               </Select>
             </FormGroup>
 
@@ -132,9 +136,6 @@ function ConfigurationSidebar({
           </SectionContent>
         )}
       </ConfigSection>
-
-    
-
     </Sidebar>
   );
 }

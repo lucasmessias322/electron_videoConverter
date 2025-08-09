@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "os";
 import ffmpeg from "fluent-ffmpeg";
-import fs from "node:fs"
+import fs from "node:fs";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -105,6 +105,14 @@ const speedMap = {
   veryslow: "veryslow",
 };
 
+// Função para sanitizar nomes de arquivos
+const sanitizeFilename = (filename: string): string => {
+  return filename
+    .replace(/[\\/:*?"<>|]/g, "_") // Substitui caracteres inválidos por '_'
+    .replace(/\s+/g, "_") // Substitui espaços por '_'
+    .replace(/\(|\)/g, ""); // Remove parênteses
+};
+
 ipcMain.handle(
   "convert-videos",
   async (_: IpcMainInvokeEvent, payload: ConversionPayload) => {
@@ -131,22 +139,87 @@ ipcMain.handle(
 
     const convertedPaths: string[] = [];
 
+    // Detectar suporte a codificadores de hardware
+    let hardwareEncoder: string | null = null;
+    if (useHardwareAcceleration) {
+      try {
+        const encoders = await new Promise<string[]>((resolve, reject) => {
+          ffmpeg.getAvailableEncoders((err, encoders) => {
+            if (err) reject(err);
+            else resolve(Object.keys(encoders));
+          });
+        });
+        if (encoders.includes("h264_amf")) {
+          hardwareEncoder = "h264_amf"; // AMD GPU
+        } else if (encoders.includes("h264_nvenc")) {
+          hardwareEncoder = "h264_nvenc"; // NVIDIA GPU
+        }
+        console.log("Codificador de hardware detectado:", hardwareEncoder);
+      } catch (err) {
+        console.error("Erro ao detectar codificadores de hardware:", err);
+      }
+    }
+
     for (const filePath of files) {
       const parsedPath = path.parse(filePath);
       const saveDir = outputFolder || parsedPath.dir;
 
-      const outputPath = path.join(
-        saveDir,
+      // Sanitizar o nome do arquivo de saída
+      const outputFilename = sanitizeFilename(
         `${parsedPath.name}_Converted.${format}`
       );
+      const outputPath = path.join(saveDir, outputFilename);
+
+      // Verificar se o diretório de saída existe e é gravável
+      try {
+        await fs.promises.access(saveDir, fs.constants.W_OK);
+      } catch (err) {
+        throw new Error(`Diretório de saída não é gravável: ${saveDir}`);
+      }
 
       const outputOptions: string[] = [];
 
-      if (useHardwareAcceleration && format === "mp4") {
-        outputOptions.push("-c:v h264_amf");
+      // Normalizar formato
+      let targetFormat = format.trim().toLowerCase();
+      if (targetFormat === "mkv") {
+        targetFormat = "matroska";
+      }
+
+      // Configurações de codec com base no formato e aceleração por hardware
+      if (format !== "") {
+        if (targetFormat === "webm") {
+          outputOptions.push("-c:v libvpx-vp9");
+          outputOptions.push("-c:a libopus");
+        } else if (targetFormat === "mpeg" || targetFormat === "mpg") {
+          outputOptions.push("-c:v mpeg2video");
+          outputOptions.push("-qscale:v 2"); // Qualidade boa
+          outputOptions.push("-c:a mp2");
+          outputOptions.push("-b:a 192k");
+        } else {
+          if (useHardwareAcceleration && hardwareEncoder) {
+            outputOptions.push(`-c:v ${hardwareEncoder}`);
+            if (hardwareEncoder === "h264_nvenc") {
+              outputOptions.push(`-preset ${speedMap[speed] || "p4"}`);
+            } else if (hardwareEncoder === "h264_amf") {
+              const amfQualityMap = {
+                ultrafast: "speed",
+                fast: "speed",
+                medium: "balanced",
+                slow: "quality",
+                veryslow: "quality",
+              };
+              outputOptions.push(
+                `-quality ${amfQualityMap[speed] || "balanced"}`
+              );
+            }
+          } else {
+            outputOptions.push("-c:v libx264");
+            outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
+            outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
+          }
+        }
       } else {
-        outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
-        outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
+        throw new Error(`Formato não suportado: ${format}`);
       }
 
       if (quality !== "original") {
@@ -160,33 +233,45 @@ ipcMain.handle(
         file: filePath,
       });
 
-      await new Promise<void>((resolve, reject) => {
-        ffmpeg(filePath)
-          .outputOptions(outputOptions)
-          .on("start", (commandLine) => {
-            console.log("FFmpeg command:", commandLine);
-          })
-          .on("progress", (progress) => {
-            const percent = Math.floor(progress.percent || 0);
-            win?.webContents.send("conversion-progress", {
-              file: filePath,
-              percent,
-            });
-          })
-          .on("end", () => {
-            console.log(`✅ Convertido: ${outputPath}`);
-            win?.webContents.send("conversion-completed", { file: filePath });
-
-            convertedPaths.push(outputPath);
-            resolve();
-          })
-          .on("error", (err) => {
-            console.error("❌ Erro na conversão:", err.message);
-            reject(err);
-          })
-          .toFormat(format)
-          .save(outputPath);
-      });
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const ffmpegInstance = ffmpeg(filePath)
+            .outputOptions([...outputOptions, "-y"]) // Adiciona -y para sobrescrever
+            .toFormat(targetFormat)
+            .on("start", (commandLine) => {
+              console.log(`FFmpeg command for ${filePath}:`, commandLine);
+            })
+            .on("progress", (progress) => {
+              const percent = Math.floor(progress.percent || 0);
+              win?.webContents.send("conversion-progress", {
+                file: filePath,
+                percent,
+              });
+            })
+            .on("end", () => {
+              console.log(`✅ Convertido: ${outputPath}`);
+              win?.webContents.send("conversion-completed", { file: filePath });
+              convertedPaths.push(outputPath);
+              resolve();
+            })
+            .on("error", (err) => {
+              console.error(
+                `❌ Erro na conversão de ${filePath}:`,
+                err.message
+              );
+              reject(
+                new Error(`Falha na conversão de ${filePath}: ${err.message}`)
+              );
+            })
+            .save(outputPath);
+        });
+      } catch (err) {
+        win?.webContents.send("conversion-error", {
+          file: filePath,
+          message: err.message,
+        });
+        throw err;
+      }
     }
 
     if (openFolder && convertedPaths.length > 0) {

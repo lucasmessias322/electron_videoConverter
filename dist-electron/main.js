@@ -3450,6 +3450,9 @@ const speedMap = {
   slow: "slow",
   veryslow: "veryslow"
 };
+const sanitizeFilename = (filename) => {
+  return filename.replace(/[\\/:*?"<>|]/g, "_").replace(/\s+/g, "_").replace(/\(|\)/g, "");
+};
 electron.ipcMain.handle(
   "convert-videos",
   async (_, payload) => {
@@ -3472,19 +3475,76 @@ electron.ipcMain.handle(
       "480p": "854x480"
     };
     const convertedPaths = [];
+    let hardwareEncoder = null;
+    if (useHardwareAcceleration) {
+      try {
+        const encoders = await new Promise((resolve, reject) => {
+          ffmpeg.getAvailableEncoders((err, encoders2) => {
+            if (err) reject(err);
+            else resolve(Object.keys(encoders2));
+          });
+        });
+        if (encoders.includes("h264_amf")) {
+          hardwareEncoder = "h264_amf";
+        } else if (encoders.includes("h264_nvenc")) {
+          hardwareEncoder = "h264_nvenc";
+        }
+        console.log("Codificador de hardware detectado:", hardwareEncoder);
+      } catch (err) {
+        console.error("Erro ao detectar codificadores de hardware:", err);
+      }
+    }
     for (const filePath of files) {
       const parsedPath = path$2.parse(filePath);
       const saveDir = outputFolder || parsedPath.dir;
-      const outputPath = path$2.join(
-        saveDir,
+      const outputFilename = sanitizeFilename(
         `${parsedPath.name}_Converted.${format}`
       );
+      const outputPath = path$2.join(saveDir, outputFilename);
+      try {
+        await fs.promises.access(saveDir, fs.constants.W_OK);
+      } catch (err) {
+        throw new Error(`Diretório de saída não é gravável: ${saveDir}`);
+      }
       const outputOptions = [];
-      if (useHardwareAcceleration && format === "mp4") {
-        outputOptions.push("-c:v h264_amf");
+      let targetFormat = format.trim().toLowerCase();
+      if (targetFormat === "mkv") {
+        targetFormat = "matroska";
+      }
+      if (format !== "") {
+        if (targetFormat === "webm") {
+          outputOptions.push("-c:v libvpx-vp9");
+          outputOptions.push("-c:a libopus");
+        } else if (targetFormat === "mpeg" || targetFormat === "mpg") {
+          outputOptions.push("-c:v mpeg2video");
+          outputOptions.push("-qscale:v 2");
+          outputOptions.push("-c:a mp2");
+          outputOptions.push("-b:a 192k");
+        } else {
+          if (useHardwareAcceleration && hardwareEncoder) {
+            outputOptions.push(`-c:v ${hardwareEncoder}`);
+            if (hardwareEncoder === "h264_nvenc") {
+              outputOptions.push(`-preset ${speedMap[speed] || "p4"}`);
+            } else if (hardwareEncoder === "h264_amf") {
+              const amfQualityMap = {
+                ultrafast: "speed",
+                fast: "speed",
+                medium: "balanced",
+                slow: "quality",
+                veryslow: "quality"
+              };
+              outputOptions.push(
+                `-quality ${amfQualityMap[speed] || "balanced"}`
+              );
+            }
+          } else {
+            outputOptions.push("-c:v libx264");
+            outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
+            outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
+          }
+        }
       } else {
-        outputOptions.push(`-preset ${speedMap[speed] || "medium"}`);
-        outputOptions.push(`-threads ${cpuCores || os.cpus().length}`);
+        throw new Error(`Formato não suportado: ${format}`);
       }
       if (quality !== "original") {
         const resolution = resolutionMap[quality];
@@ -3495,25 +3555,38 @@ electron.ipcMain.handle(
       win == null ? void 0 : win.webContents.send("conversion-started", {
         file: filePath
       });
-      await new Promise((resolve, reject) => {
-        ffmpeg(filePath).outputOptions(outputOptions).on("start", (commandLine) => {
-          console.log("FFmpeg command:", commandLine);
-        }).on("progress", (progress) => {
-          const percent = Math.floor(progress.percent || 0);
-          win == null ? void 0 : win.webContents.send("conversion-progress", {
-            file: filePath,
-            percent
-          });
-        }).on("end", () => {
-          console.log(`✅ Convertido: ${outputPath}`);
-          win == null ? void 0 : win.webContents.send("conversion-completed", { file: filePath });
-          convertedPaths.push(outputPath);
-          resolve();
-        }).on("error", (err) => {
-          console.error("❌ Erro na conversão:", err.message);
-          reject(err);
-        }).toFormat(format).save(outputPath);
-      });
+      try {
+        await new Promise((resolve, reject) => {
+          const ffmpegInstance = ffmpeg(filePath).outputOptions([...outputOptions, "-y"]).toFormat(targetFormat).on("start", (commandLine) => {
+            console.log(`FFmpeg command for ${filePath}:`, commandLine);
+          }).on("progress", (progress) => {
+            const percent = Math.floor(progress.percent || 0);
+            win == null ? void 0 : win.webContents.send("conversion-progress", {
+              file: filePath,
+              percent
+            });
+          }).on("end", () => {
+            console.log(`✅ Convertido: ${outputPath}`);
+            win == null ? void 0 : win.webContents.send("conversion-completed", { file: filePath });
+            convertedPaths.push(outputPath);
+            resolve();
+          }).on("error", (err) => {
+            console.error(
+              `❌ Erro na conversão de ${filePath}:`,
+              err.message
+            );
+            reject(
+              new Error(`Falha na conversão de ${filePath}: ${err.message}`)
+            );
+          }).save(outputPath);
+        });
+      } catch (err) {
+        win == null ? void 0 : win.webContents.send("conversion-error", {
+          file: filePath,
+          message: err.message
+        });
+        throw err;
+      }
     }
     if (openFolder && convertedPaths.length > 0) {
       const { shell } = await import("electron");

@@ -49,89 +49,74 @@ function App() {
   // ⬇️ Funções de manipulação de arquivos
   const handleAddClick = () => fileInputRef.current?.click();
 
-  // const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files = e.target.files;
-  //   if (!files) return;
+ const generateThumbnailsSequentially = async (videos: VideoItem[]) => {
+    for (const video of videos) {
+      try {
+        const thumbnail = await window.electronAPI.generateThumbnail(
+          video.path
+        );
+        setVideosToConvert((prev) =>
+          prev.map((v) => (v.path === video.path ? { ...v, thumbnail } : v))
+        );
+      } catch (err) {
+        console.error(`Failed to generate thumbnail for ${video.path}:`, err);
+        // Optionally update with a placeholder or leave thumbnail undefined
+        setVideosToConvert((prev) =>
+          prev.map((v) =>
+            v.path === video.path ? { ...v, thumbnail: undefined } : v
+          )
+        );
+      }
+    }
+  };
 
-  //   const fileArray = Array.from(files).map((file) => ({
-  //     file,
-  //     path: (file as any).path,
-  //     name: file.name,
-  //     converting: false,
-  //     converted: false,
-  //   }));
-
-  //   setVideosToConvert((prev) => [...prev, ...fileArray]);
-  //   e.target.value = "";
-  // };
+  // Modified handleFilesSelected
   const handleFilesSelected = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = e.target.files;
     if (!files) return;
 
-    const fileArray = await Promise.all(
-      Array.from(files).map(async (file) => {
-        const path = (file as any).path;
-        const thumbnail = await window.electronAPI
-          .generateThumbnail(path)
-          .catch(() => undefined);
+    const fileArray: VideoItem[] = Array.from(files).map((file) => ({
+      file: file as FileWithPath,
+      path: (file as any).path,
+      name: file.name,
+      converting: false,
+      converted: false,
+      thumbnail: undefined, // Initially no thumbnail
+    }));
 
-        return {
-          file,
-          path,
-          name: file.name,
-          converting: false,
-          converted: false,
-          thumbnail,
-        };
-      })
-    );
-
+    // Add videos to the list immediately
     setVideosToConvert((prev) => [...prev, ...fileArray]);
+
+    // Generate thumbnails in the background
+    generateThumbnailsSequentially(fileArray);
+
     e.target.value = "";
   };
 
-  // const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-  //   e.preventDefault();
-  //   setIsDragging(false);
-
-  //   const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
-  //     file,
-  //     path: (file as any).path,
-  //     name: file.name,
-  //     converting: false,
-  //     converted: false,
-  //   }));
-
-  //   setVideosToConvert((prev) => [...prev, ...droppedFiles]);
-  // };
-
+  // Modified handleDrop
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
 
-    const droppedFiles = await Promise.all(
-      Array.from(e.dataTransfer.files).map(async (file) => {
-        const path = (file as any).path;
-        const thumbnail = await window.electronAPI
-          .generateThumbnail(path)
-          .catch(() => undefined);
-
-        return {
-          file,
-          path,
-          name: file.name,
-          converting: false,
-          converted: false,
-          thumbnail,
-        };
+    const droppedFiles: VideoItem[] = Array.from(e.dataTransfer.files).map(
+      (file) => ({
+        file: file as FileWithPath,
+        path: (file as any).path,
+        name: file.name,
+        converting: false,
+        converted: false,
+        thumbnail: undefined, // Initially no thumbnail
       })
     );
 
+    // Add videos to the list immediately
     setVideosToConvert((prev) => [...prev, ...droppedFiles]);
-  };
 
+    // Generate thumbnails in the background
+    generateThumbnailsSequentially(droppedFiles);
+  };
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
@@ -229,11 +214,11 @@ function App() {
         const parsed = JSON.parse(savedSettings);
         if (parsed.useHardwareAcceleration !== undefined)
           setUseHardwareAcceleration(parsed.useHardwareAcceleration);
-        if (parsed.format) setFormat(parsed.format);
+
         if (parsed.quality) setQuality(parsed.quality);
         if (parsed.speed) setSpeed(parsed.speed);
         if (parsed.openFolder !== undefined) setOpenFolder(parsed.openFolder);
-        if (parsed.outputFolder) setOutputFolder(parsed.outputFolder);
+
         if (parsed.cpuCores) setCpuCores(parsed.cpuCores);
       } catch (err) {
         console.warn("Erro ao carregar configurações salvas:", err);
@@ -253,18 +238,18 @@ function App() {
       quality,
       speed,
       openFolder,
-      outputFolder,
+
       cpuCores,
     };
     localStorage.setItem("convertSettings", JSON.stringify(settings));
   }, [
     settingsLoaded,
     useHardwareAcceleration,
-    format,
+
     quality,
     speed,
     openFolder,
-    outputFolder,
+
     cpuCores,
   ]);
 
@@ -320,6 +305,8 @@ function App() {
                             src={`file://${video.thumbnail}`}
                             alt="Thumbnail"
                           />
+                        ) : video.thumbnail === undefined ? (
+                          <div className="loading">Loading...</div> // Or a spinner component
                         ) : (
                           <FaFileVideo size={28} color="#7b2cbf" />
                         )}
@@ -470,6 +457,16 @@ const LeftSide = styled.div`
   gap: 12px;
 
   .VideoThumb {
+    .loading {
+      width: 150px;
+      height: 100px;
+      border-radius: 8px;
+      border: 1px solid #7b2cbf;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+    }
     img {
       width: 150px;
       height: 100px;
