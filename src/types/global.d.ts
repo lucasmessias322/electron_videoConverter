@@ -29,6 +29,9 @@ declare global {
       getCpuCores: () => Promise<number>;
 
       selectOutputFolder: () => Promise<string>;
+      deleteFile: (filePath: string) => Promise<void>;
+      generateThumbnail: (videoPath: string) => Promise<string>;
+   
     };
   }
 }

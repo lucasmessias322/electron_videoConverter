@@ -3,32 +3,32 @@ import styled from "styled-components";
 import { MdArrowRight } from "react-icons/md"; // Corrigido
 
 export interface ConfigurationSidebarProps {
-  isSection1Open: boolean;
-  setIsSection1Open: React.Dispatch<React.SetStateAction<boolean>>;
-  isSection2Open: boolean;
-  setIsSection2Open: React.Dispatch<React.SetStateAction<boolean>>;
+  isSection1Open?: boolean;
+  setIsSection1Open?: React.Dispatch<React.SetStateAction<boolean>>;
+  isSection2Open?: boolean;
+  setIsSection2Open?: React.Dispatch<React.SetStateAction<boolean>>;
 
-  format: string;
-  setFormat: React.Dispatch<React.SetStateAction<string>>;
+  format?: string;
+  setFormat?: React.Dispatch<React.SetStateAction<string>>;
 
-  quality: string;
-  setQuality: React.Dispatch<React.SetStateAction<string>>;
+  quality?: string;
+  setQuality?: React.Dispatch<React.SetStateAction<string>>;
 
-  speed: string;
-  setSpeed: React.Dispatch<React.SetStateAction<string>>;
+  speed?: string;
+  setSpeed?: React.Dispatch<React.SetStateAction<string>>;
 
-  cpuCores: number;
-  setCpuCores: React.Dispatch<React.SetStateAction<number>>;
-  maxCpuCores: number;
+  cpuCores?: number;
+  setCpuCores?: React.Dispatch<React.SetStateAction<number>>;
+  maxCpuCores?: number;
 
-  outputFolder: string;
-  setOutputFolder: React.Dispatch<React.SetStateAction<string>>;
+  outputFolder?: string;
+  setOutputFolder?: React.Dispatch<React.SetStateAction<string>>;
 
-  openFolder: boolean;
-  setOpenFolder: React.Dispatch<React.SetStateAction<boolean>>;
+  openFolder?: boolean;
+  setOpenFolder?: React.Dispatch<React.SetStateAction<boolean>>;
 
-  useHardwareAcceleration: boolean;
-  setUseHardwareAcceleration: React.Dispatch<React.SetStateAction<boolean>>;
+  useHardwareAcceleration?: boolean;
+  setUseHardwareAcceleration?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function ConfigurationSidebar({
@@ -38,17 +38,10 @@ function ConfigurationSidebar({
   setQuality,
   speed,
   setSpeed,
-  cpuCores,
-  setCpuCores,
-  maxCpuCores,
+
   outputFolder,
   setOutputFolder,
-  openFolder,
-  setOpenFolder,
-  useHardwareAcceleration,
-  setUseHardwareAcceleration,
 }: ConfigurationSidebarProps) {
-  const [isSection1Open, setIsSection1Open] = useState(true);
   const [isSection2Open, setIsSection2Open] = useState(true);
 
   return (
@@ -99,7 +92,7 @@ function ConfigurationSidebar({
                 <option value="mkv">MKV</option>
                 <option value="avi">AVI</option>
                 <option value="mov">MOV</option>
-                <option value="flv">FLV</option>{" "}
+                <option value="flv">FLV</option>
                 <option value="mpeg">MPEG</option>
                 <option value="webm">WebM</option>
               </Select>

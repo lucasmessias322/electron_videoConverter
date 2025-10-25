@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IoMdSettings } from "react-icons/io";
@@ -7,7 +8,16 @@ import {
   VscChromeMaximize,
 } from "react-icons/vsc";
 import convertHeroLogo from "/convertHero.ico";
-import { ConfigurationSidebarProps } from "../ConfigurationSidebar/index";
+
+export interface WindowControlsProps {
+  useHardwareAcceleration: boolean;
+  setUseHardwareAcceleration: (value: boolean) => void;
+  cpuCores: number;
+  setCpuCores: (value: number) => void;
+  maxCpuCores: number;
+  openFolder: boolean;
+  setOpenFolder: (value: boolean) => void;
+}
 
 function WindowControls({
   useHardwareAcceleration,
@@ -17,11 +27,9 @@ function WindowControls({
   maxCpuCores,
   openFolder,
   setOpenFolder,
-}: ConfigurationSidebarProps) {
+}: WindowControlsProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "geral" | "interface" | "avancado"
-  >("geral");
+  const [activeTab, setActiveTab] = useState<"geral" | "avancado">("geral");
 
   const handleWindowAction = (action: "minimize" | "maximize" | "close") => {
     window.electronAPI?.windowControl?.(action);
@@ -86,7 +94,6 @@ function WindowControls({
               >
                 Geral
               </SidebarItem>
-             
               <SidebarItem
                 onClick={() => setActiveTab("avancado")}
                 $active={activeTab === "avancado"}
@@ -105,7 +112,7 @@ function WindowControls({
                         type="checkbox"
                         id="openFolderCheckbox"
                         checked={openFolder}
-                        onChange={() => setOpenFolder((prev) => !prev)}
+                        onChange={() => setOpenFolder(!openFolder)}
                       />
                       <Label htmlFor="openFolderCheckbox">
                         Abrir pasta após conversão
@@ -114,7 +121,6 @@ function WindowControls({
                   </FormGroup>
                 </>
               )}
-           
               {activeTab === "avancado" && (
                 <>
                   <h2>Configurações Avançadas</h2>
@@ -143,7 +149,7 @@ function WindowControls({
                       <input
                         type="checkbox"
                         id="hardwareAcceleration"
-                        checked={useHardwareAcceleration} // ← controle direto via estado
+                        checked={useHardwareAcceleration}
                         onChange={(e) =>
                           setUseHardwareAcceleration(e.target.checked)
                         }
@@ -165,6 +171,7 @@ function WindowControls({
 
 export default WindowControls;
 
+// Styled components
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -222,8 +229,6 @@ const Title = styled.h1`
   }
 `;
 
-// Configurações
-
 const SettingsOverlay = styled.div`
   width: 100%;
   height: 100%;
@@ -251,15 +256,6 @@ const SettingsSidebar = styled.div`
   padding: 20px;
   border-right: 1px solid #444;
   color: #ccc;
-
-  p {
-    margin-bottom: 10px;
-    cursor: pointer;
-
-    &:hover {
-      color: #fff;
-    }
-  }
 `;
 
 const SettingsContent = styled.div`
@@ -290,6 +286,7 @@ const CloseSettingsButton = styled.button`
     border-radius: 4px;
   }
 `;
+
 const SidebarItem = styled.p<{ $active: boolean }>`
   margin-bottom: 10px;
   cursor: pointer;
@@ -300,6 +297,7 @@ const SidebarItem = styled.p<{ $active: boolean }>`
     color: #fff;
   }
 `;
+
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
@@ -313,10 +311,12 @@ const CheckboxContainer = styled.div`
     cursor: pointer;
   }
 `;
+
 const Label = styled.label`
   font-size: 14px;
   color: #ddd;
 `;
+
 const FormGroup = styled.div`
   display: flex;
   align-items: center;
@@ -324,6 +324,7 @@ const FormGroup = styled.div`
   padding: 10px;
   border-bottom: 1px solid #383838;
 `;
+
 const Select = styled.select`
   background-color: #2e2e2e;
   color: white;
