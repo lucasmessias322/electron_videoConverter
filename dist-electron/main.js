@@ -23,7 +23,6 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const electron = require("electron");
-const node_module = require("node:module");
 const node_url = require("node:url");
 const path$2 = require("node:path");
 const os = require("os");
@@ -3381,7 +3380,6 @@ FfmpegCommand.ffprobe = function(file) {
 requireRecipes()(FfmpegCommand.prototype);
 var fluentFfmpeg = fluentFfmpeg$1;
 const ffmpeg = /* @__PURE__ */ getDefaultExportFromCjs(fluentFfmpeg);
-node_module.createRequire(typeof document === "undefined" ? require("url").pathToFileURL(__filename).href : _documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === "SCRIPT" && _documentCurrentScript.src || new URL("main.js", document.baseURI).href);
 const __dirname$1 = path$2.dirname(node_url.fileURLToPath(typeof document === "undefined" ? require("url").pathToFileURL(__filename).href : _documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === "SCRIPT" && _documentCurrentScript.src || new URL("main.js", document.baseURI).href));
 process.env.APP_ROOT = path$2.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -3557,7 +3555,7 @@ electron.ipcMain.handle(
       });
       try {
         await new Promise((resolve, reject) => {
-          const ffmpegInstance = ffmpeg(filePath).outputOptions([...outputOptions, "-y"]).toFormat(targetFormat).on("start", (commandLine) => {
+          ffmpeg(filePath).outputOptions([...outputOptions, "-y"]).toFormat(targetFormat).on("start", (commandLine) => {
             console.log(`FFmpeg command for ${filePath}:`, commandLine);
           }).on("progress", (progress) => {
             const percent = Math.floor(progress.percent || 0);
@@ -3581,11 +3579,12 @@ electron.ipcMain.handle(
           }).save(outputPath);
         });
       } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
         win == null ? void 0 : win.webContents.send("conversion-error", {
           file: filePath,
-          message: err.message
+          message
         });
-        throw err;
+        throw new Error(message);
       }
     }
     if (openFolder && convertedPaths.length > 0) {

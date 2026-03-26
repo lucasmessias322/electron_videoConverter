@@ -1,7 +1,20 @@
 import { ipcRenderer, contextBridge } from "electron";
 
+type ConversionOptions = {
+  files: string[];
+  format: string;
+  quality: string;
+  speed: string;
+  openFolder: boolean;
+  outputFolder: string;
+  cpuCores: number;
+  useHardwareAcceleration: boolean;
+};
+
+type WindowAction = "minimize" | "maximize" | "close";
+
 contextBridge.exposeInMainWorld("electronAPI", {
-  convertVideos: (options: any) =>
+  convertVideos: (options: ConversionOptions) =>
     ipcRenderer.invoke("convert-videos", options),
 
   onProgress: (callback: (data: { file: string; percent: number }) => void) =>
@@ -14,9 +27,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("conversion-completed", (_event, data) => callback(data)),
 
   selectOutputFolder: () => ipcRenderer.invoke("select-output-folder"),
-  windowControl: (action: any) => ipcRenderer.send("window-control", action),
+  windowControl: (action: WindowAction) =>
+    ipcRenderer.send("window-control", action),
   getCpuCores: () => ipcRenderer.invoke("getCpuCores"),
- generateThumbnail: (videoPath: string) =>
+  generateThumbnail: (videoPath: string) =>
     ipcRenderer.invoke("generate-thumbnail", videoPath),
   deleteFile: (filePath: string) => ipcRenderer.invoke("delete-file", filePath),
 });

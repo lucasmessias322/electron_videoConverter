@@ -29,6 +29,7 @@ declare global {
       getCpuCores: () => Promise<number>;
 
       selectOutputFolder: () => Promise<string>;
+      windowControl: (action: "minimize" | "maximize" | "close") => void;
       deleteFile: (filePath: string) => Promise<void>;
       generateThumbnail: (videoPath: string) => Promise<string>;
    

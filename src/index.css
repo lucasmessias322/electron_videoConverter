@@ -1,28 +1,72 @@
+:root {
+  color-scheme: dark;
+  --bg-app: #0b1220;
+  --bg-panel: rgba(15, 24, 39, 0.88);
+  --bg-panel-strong: #111b2d;
+  --bg-elevated: #16243b;
+  --surface-soft: rgba(255, 255, 255, 0.05);
+  --surface-strong: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text-main: #f7f8fb;
+  --text-soft: #b7c0d4;
+  --text-muted: #7f8aa3;
+  --accent: #7954ff;
+  --accent-strong: #633fc7;
+  --accent-cool: #4ebdff;
+  --success: #46d39b;
+  --warning: #f5c451;
+  --danger: #ff6b7a;
+  --shadow-panel: 0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
-
-  font-family: Arial, Helvetica, sans-serif;
-    
+  padding: 0;
+  font-family: "Segoe UI Variable Display", "Trebuchet MS", "Segoe UI", sans-serif;
 }
 
 html,
-body {
-  color: whitesmoke;
-  height: 100%;
+body,
+#root {
   width: 100%;
-  background-color: #181818;
-
+  height: 100%;
 }
 
- ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
- ::-webkit-scrollbar {
-    width: 5px;
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #7b2cbf;
-  }
+body {
+  color: var(--text-main);
+  background: var(--bg-app);
+  overflow: hidden;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(255, 123, 84, 0.3);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent), var(--accent-cool));
+  border-radius: 999px;
+}

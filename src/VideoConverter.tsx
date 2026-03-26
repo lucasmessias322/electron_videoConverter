@@ -1,11 +1,17 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
-import { FaFileVideo } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaClock,
+  FaFileVideo,
+  FaFolderOpen,
+  FaLayerGroup,
+  FaPlus,
+} from "react-icons/fa";
 import { VscChromeClose } from "react-icons/vsc";
 import ConfigurationSidebar from "./Components/ConfigurationSidebar";
 import ProgressBar from "./Components/ProgressBar";
 import * as C from "./VideoConverterStyle";
 
-// Define types centrally
 type FileWithPath = File & { path: string };
 
 type VideoItem = {
@@ -14,20 +20,18 @@ type VideoItem = {
   name: string;
   converting: boolean;
   converted: boolean;
-  thumbnail?: string;
+  thumbnail?: string | null;
 };
 
-// Props interface for VideoConverter
 interface VideoConverterProps {
   cpuCores: number;
   openFolder: boolean;
   useHardwareAcceleration: boolean;
 }
 
-// Reducer for video list
 type VideoAction =
   | { type: "ADD_VIDEOS"; videos: VideoItem[] }
-  | { type: "UPDATE_THUMBNAIL"; path: string; thumbnail: string | undefined }
+  | { type: "UPDATE_THUMBNAIL"; path: string; thumbnail: string | null }
   | { type: "START_CONVERSION"; path: string }
   | { type: "COMPLETE_CONVERSION"; path: string }
   | { type: "REMOVE_VIDEO"; index: number };
@@ -37,119 +41,152 @@ const videoReducer = (state: VideoItem[], action: VideoAction): VideoItem[] => {
     case "ADD_VIDEOS":
       return [...state, ...action.videos];
     case "UPDATE_THUMBNAIL":
-      return state.map((v) =>
-        v.path === action.path ? { ...v, thumbnail: action.thumbnail } : v
+      return state.map((video) =>
+        video.path === action.path
+          ? { ...video, thumbnail: action.thumbnail }
+          : video
       );
     case "START_CONVERSION":
-      return state.map((v) =>
-        v.path === action.path ? { ...v, converting: true } : v
+      return state.map((video) =>
+        video.path === action.path ? { ...video, converting: true } : video
       );
     case "COMPLETE_CONVERSION":
-      return state.map((v) =>
-        v.path === action.path
-          ? { ...v, converting: false, converted: true }
-          : v
+      return state.map((video) =>
+        video.path === action.path
+          ? { ...video, converting: false, converted: true }
+          : video
       );
-    case "REMOVE_VIDEO":
+    case "REMOVE_VIDEO": {
       const removed = state[action.index];
-      if (removed.thumbnail) {
+
+      if (removed?.thumbnail) {
         window.electronAPI.deleteFile?.(removed.thumbnail);
       }
-      return state.filter((_, i) => i !== action.index);
+
+      return state.filter((_, index) => index !== action.index);
+    }
     default:
       return state;
   }
 };
 
-// VideoItemComponent
 interface VideoItemProps {
   video: VideoItem;
   index: number;
+  progressPercent?: number;
   onRemove: (index: number) => void;
 }
 
 const VideoItemComponent: React.FC<VideoItemProps> = ({
   video,
   index,
+  progressPercent,
   onRemove,
-}) => (
-  <C.VideoItemStyled isConverting={video.converting}>
-    <C.LeftSide>
-      <div className="videoInfos">
-        <div className="VideoThumb">
+}) => {
+  const extension = video.name.includes(".")
+    ? video.name.split(".").pop()?.toUpperCase()
+    : "VIDEO";
+
+  const status = video.converted
+    ? { label: "Concluido", tone: "success" as const, icon: <FaCheckCircle /> }
+    : video.converting
+      ? { label: "Convertendo", tone: "accent" as const, icon: <FaLayerGroup /> }
+      : { label: "Na fila", tone: "neutral" as const, icon: <FaClock /> };
+
+  return (
+    <C.VideoItemStyled
+      $isConverting={video.converting}
+      $isActive={typeof progressPercent === "number"}
+    >
+      <C.LeftSide>
+        <C.ThumbFrame>
           {video.thumbnail ? (
             <img src={`file://${video.thumbnail}`} alt="Thumbnail" />
           ) : video.thumbnail === undefined ? (
-            <div className="loading">Loading...</div>
+            <div className="loading">Gerando capa...</div>
           ) : (
-            <FaFileVideo size={28} color="#7b2cbf" />
+            <div className="fallback">
+              <FaFileVideo size={28} />
+            </div>
+          )}
+        </C.ThumbFrame>
+
+        <div className="videoInfos">
+          <div className="titleRow">
+            <span className="videoname" title={video.name}>
+              {video.name}
+            </span>
+            <C.StatusBadge $tone={status.tone}>
+              {status.icon}
+              {status.label}
+            </C.StatusBadge>
+          </div>
+
+          <C.MetaRow>
+            <span>{extension}</span>
+            {typeof progressPercent === "number" && <span>{progressPercent}%</span>}
+            <span className="path" title={video.path}>
+              {video.path}
+            </span>
+          </C.MetaRow>
+
+          {typeof progressPercent === "number" && (
+            <C.InlineProgressTrack>
+              <C.InlineProgressValue style={{ width: `${progressPercent}%` }} />
+            </C.InlineProgressTrack>
           )}
         </div>
-        <span className="videoname">{video.name}</span>
-        {video.converting && <span> Convertendo...</span>}
-        {video.converted && <span>✅ Convertido</span>}
-      </div>
-    </C.LeftSide>
-    <C.RightSide>
-      <C.IconButton onClick={() => onRemove(index)}>
-        <VscChromeClose />
-      </C.IconButton>
-    </C.RightSide>
-  </C.VideoItemStyled>
-);
+      </C.LeftSide>
+
+      <C.RightSide>
+        <C.IconButton onClick={() => onRemove(index)} title="Remover video">
+          <VscChromeClose />
+        </C.IconButton>
+      </C.RightSide>
+    </C.VideoItemStyled>
+  );
+};
 
 function VideoConverter({
   cpuCores,
   openFolder,
   useHardwareAcceleration,
 }: VideoConverterProps) {
-  // Conversion settings
   const [format, setFormat] = useState<string>("mp4");
   const [quality, setQuality] = useState<string>("original");
   const [speed, setSpeed] = useState<string>("medium");
   const [outputFolder, setOutputFolder] = useState<string>("");
 
-  // Video list with reducer
   const [videosToConvert, dispatchVideos] = useReducer(videoReducer, []);
-
-  // Drag and drop
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Progress
   const [progress, setProgress] = useState<{
     file: string;
     percent: number;
   } | null>(null);
 
-  // Electron IPC listeners
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const { onProgress, onConversionStarted, onConversionCompleted } =
       window.electronAPI;
 
-    if (onProgress) {
-      onProgress((data) => setProgress(data));
-    }
-    if (onConversionStarted) {
-      onConversionStarted((data) =>
-        dispatchVideos({ type: "START_CONVERSION", path: data.file })
-      );
-    }
-    if (onConversionCompleted) {
-      onConversionCompleted((data) =>
-        dispatchVideos({ type: "COMPLETE_CONVERSION", path: data.file })
-      );
-    }
+    onProgress?.((data) => setProgress(data));
+    onConversionStarted?.((data) =>
+      dispatchVideos({ type: "START_CONVERSION", path: data.file })
+    );
+    onConversionCompleted?.((data) =>
+      dispatchVideos({ type: "COMPLETE_CONVERSION", path: data.file })
+    );
   }, []);
 
-  const handleAddClick = () => fileInputRef.current?.click();
+  const handleAddClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const generateThumbnailsSequentially = async (videos: VideoItem[]) => {
     for (const video of videos) {
       try {
-        const thumbnail = await window.electronAPI.generateThumbnail(
-          video.path
-        );
+        const thumbnail = await window.electronAPI.generateThumbnail(video.path);
         dispatchVideos({
           type: "UPDATE_THUMBNAIL",
           path: video.path,
@@ -160,74 +197,57 @@ function VideoConverter({
         dispatchVideos({
           type: "UPDATE_THUMBNAIL",
           path: video.path,
-          thumbnail: undefined,
+          thumbnail: null,
         });
       }
     }
   };
 
-  const handleFilesSelected = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const fileArray: VideoItem[] = Array.from(files).map((file) => ({
+  const buildVideoItems = (files: FileList | File[]) =>
+    Array.from(files).map((file) => ({
       file: file as FileWithPath,
-      path: (file as any).path,
+      path: (file as FileWithPath).path,
       name: file.name,
       converting: false,
       converted: false,
       thumbnail: undefined,
     }));
 
-    dispatchVideos({ type: "ADD_VIDEOS", videos: fileArray });
-    generateThumbnailsSequentially(fileArray);
+  const handleFilesSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
 
-    e.target.value = "";
+    const fileArray = buildVideoItems(files);
+    dispatchVideos({ type: "ADD_VIDEOS", videos: fileArray });
+    void generateThumbnailsSequentially(fileArray);
+    event.target.value = "";
   };
 
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
     setIsDragging(false);
 
-    const droppedFiles: VideoItem[] = Array.from(e.dataTransfer.files).map(
-      (file) => ({
-        file: file as FileWithPath,
-        path: (file as any).path,
-        name: file.name,
-        converting: false,
-        converted: false,
-        thumbnail: undefined,
-      })
-    );
-
+    const droppedFiles = buildVideoItems(event.dataTransfer.files);
     dispatchVideos({ type: "ADD_VIDEOS", videos: droppedFiles });
-    generateThumbnailsSequentially(droppedFiles);
+    void generateThumbnailsSequentially(droppedFiles);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
     setIsDragging(false);
-  };
-
-  const handleRemoveVideo = (index: number) => {
-    dispatchVideos({ type: "REMOVE_VIDEO", index });
   };
 
   const handleConvert = async () => {
     if (videosToConvert.length === 0) return;
 
-    const filePaths = videosToConvert.map((video) => video.path);
-
     try {
       await window.electronAPI.convertVideos({
-        files: filePaths,
+        files: videosToConvert.map((video) => video.path),
         format,
         quality,
         speed,
@@ -238,18 +258,52 @@ function VideoConverter({
       });
       setProgress(null);
     } catch (err) {
-      alert("Erro na conversão: " + err);
+      alert("Erro na conversao: " + err);
     }
   };
+
+  const convertedCount = videosToConvert.filter((video) => video.converted).length;
+  const convertingCount = videosToConvert.filter((video) => video.converting).length;
+  const pendingCount =
+    videosToConvert.length - convertedCount - convertingCount;
+  const canConvert = videosToConvert.length > 0 && convertingCount === 0;
 
   return (
     <C.Container>
       <C.Header>
-        <div className="Left" />
-        <div className="header-buttons">
-          <C.Button onClick={handleAddClick}>Add Videos</C.Button>
-          <C.ButtonPrimary onClick={handleConvert}>Convert</C.ButtonPrimary>
-        </div>
+        {/* <C.HeaderCopy>
+          <span className="eyebrow">Workspace</span>
+          <h1>Fila de conversao</h1>
+          <p>
+            Organize lotes, ajuste a exportacao e acompanhe cada arquivo em um
+            fluxo mais claro.
+          </p>
+        </C.HeaderCopy> */}
+
+        <C.HeaderMetrics>
+          <C.StatCard>
+            <span>Total</span>
+            <strong>{videosToConvert.length}</strong>
+          </C.StatCard>
+          <C.StatCard>
+            <span>Pendentes</span>
+            <strong>{pendingCount}</strong>
+          </C.StatCard>
+          <C.StatCard $tone="success">
+            <span>Concluidos</span>
+            <strong>{convertedCount}</strong>
+          </C.StatCard>
+        </C.HeaderMetrics>
+
+        <C.HeaderActions>
+          <C.Button onClick={handleAddClick}>
+            <FaPlus />
+            Adicionar videos
+          </C.Button>
+          <C.ButtonPrimary onClick={handleConvert} disabled={!canConvert}>
+            {convertingCount > 0 ? "Convertendo..." : "Iniciar conversao"}
+          </C.ButtonPrimary>
+        </C.HeaderActions>
       </C.Header>
 
       <input
@@ -266,20 +320,49 @@ function VideoConverter({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          isDragging={isDragging}
+          $isDragging={isDragging}
         >
+          <C.QueueToolbar>
+            <div>
+              <span className="label">Lote atual</span>
+              <h2>Arquivos selecionados</h2>
+            </div>
+            <C.QueueHint $active={isDragging}>
+              {isDragging
+                ? "Solte os arquivos para adicionar ao lote"
+                : "Arraste novos videos para esta area"}
+            </C.QueueHint>
+          </C.QueueToolbar>
+
           {videosToConvert.length === 0 ? (
             <C.EmptyState>
-              <p>Arraste vídeos ou clique em "Add Videos" para começar!</p>
+              <div className="emptyCard">
+                <div className="iconWrap">
+                  <FaFolderOpen size={28} />
+                </div>
+                <h3>Seu lote comeca aqui</h3>
+                <p>
+                  Arraste videos para esta area ou selecione arquivos manualmente
+                  para montar a fila.
+                </p>
+                <C.ButtonPrimary onClick={handleAddClick}>
+                  Escolher videos
+                </C.ButtonPrimary>
+              </div>
             </C.EmptyState>
           ) : (
             <C.VideosList>
-              {videosToConvert.map((video, idx) => (
+              {videosToConvert.map((video, index) => (
                 <VideoItemComponent
-                  key={idx}
+                  key={`${video.path}-${index}`}
                   video={video}
-                  index={idx}
-                  onRemove={handleRemoveVideo}
+                  index={index}
+                  progressPercent={
+                    progress?.file === video.path ? progress.percent : undefined
+                  }
+                  onRemove={(itemIndex) =>
+                    dispatchVideos({ type: "REMOVE_VIDEO", index: itemIndex })
+                  }
                 />
               ))}
             </C.VideosList>

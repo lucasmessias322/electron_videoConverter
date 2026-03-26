@@ -5,14 +5,12 @@ import {
   ipcMain,
   IpcMainInvokeEvent,
 } from "electron";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "os";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "node:fs";
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, "..");
@@ -235,7 +233,7 @@ ipcMain.handle(
 
       try {
         await new Promise<void>((resolve, reject) => {
-          const ffmpegInstance = ffmpeg(filePath)
+          ffmpeg(filePath)
             .outputOptions([...outputOptions, "-y"]) // Adiciona -y para sobrescrever
             .toFormat(targetFormat)
             .on("start", (commandLine) => {
@@ -266,11 +264,12 @@ ipcMain.handle(
             .save(outputPath);
         });
       } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
         win?.webContents.send("conversion-error", {
           file: filePath,
-          message: err.message,
+          message,
         });
-        throw err;
+        throw new Error(message);
       }
     }
 

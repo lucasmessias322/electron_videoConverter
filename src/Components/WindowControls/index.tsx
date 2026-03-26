@@ -1,11 +1,10 @@
-
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { IoMdSettings } from "react-icons/io";
 import {
-  VscChromeMinimize,
   VscChromeClose,
   VscChromeMaximize,
+  VscChromeMinimize,
 } from "react-icons/vsc";
 import convertHeroLogo from "/convertHero.ico";
 
@@ -35,27 +34,33 @@ function WindowControls({
     window.electronAPI?.windowControl?.(action);
   };
 
-  const toggleSettings = () => {
-    setShowSettings((prev) => !prev);
-  };
-
   return (
     <>
       <Wrapper>
         <Left>
-          <Title>
-            <img src={convertHeroLogo} alt="ConvertHero Logo" />
-            ConvertHero
-          </Title>
+          <BrandBlock>
+            <Title>
+              <img src={convertHeroLogo} alt="ConvertHero Logo" />
+              <div>
+                <strong>ConvertHero</strong>
+                <span>Batch video converter for creators</span>
+              </div>
+            </Title>
+            <WorkspaceBadge>Messias studio</WorkspaceBadge>
+          </BrandBlock>
         </Left>
+
         <Right>
-          <div className="container">
-            <IconButton onClick={toggleSettings} title="Configurações">
+          <ActionGroup>
+            <IconButton
+              onClick={() => setShowSettings((prev) => !prev)}
+              title="Configuracoes"
+            >
               <IoMdSettings size={18} />
             </IconButton>
-          </div>
+          </ActionGroup>
 
-          <div className="container">
+          <ActionGroup>
             <IconButton
               onClick={() => handleWindowAction("minimize")}
               title="Minimizar"
@@ -64,17 +69,14 @@ function WindowControls({
             </IconButton>
             <IconButton
               onClick={() => handleWindowAction("maximize")}
-              title="Maximizar/Restaurar"
+              title="Maximizar ou restaurar"
             >
               <VscChromeMaximize size={16} />
             </IconButton>
-            <IconButton
-              onClick={() => handleWindowAction("close")}
-              title="Fechar"
-            >
+            <IconButton onClick={() => handleWindowAction("close")} title="Fechar">
               <VscChromeClose size={16} />
             </IconButton>
-          </div>
+          </ActionGroup>
         </Right>
       </Wrapper>
 
@@ -83,11 +85,21 @@ function WindowControls({
           <SettingsPanel>
             <CloseSettingsButton
               onClick={() => setShowSettings(false)}
-              title="Fechar configurações"
+              title="Fechar configuracoes"
             >
               <VscChromeClose size={18} />
             </CloseSettingsButton>
+
             <SettingsSidebar>
+              <SidebarIntro>
+                <span>Control center</span>
+                <h2>Preferencias</h2>
+                <p>
+                  Ajuste o comportamento do app para combinar com o seu fluxo de
+                  exportacao.
+                </p>
+              </SidebarIntro>
+
               <SidebarItem
                 onClick={() => setActiveTab("geral")}
                 $active={activeTab === "geral"}
@@ -98,14 +110,22 @@ function WindowControls({
                 onClick={() => setActiveTab("avancado")}
                 $active={activeTab === "avancado"}
               >
-                Avançado
+                Avancado
               </SidebarItem>
             </SettingsSidebar>
 
             <SettingsContent>
               {activeTab === "geral" && (
                 <>
-                  <h2>Configurações Gerais</h2>
+                  <SectionHeader>
+                    <span>Geral</span>
+                    <h2>Configuracoes gerais</h2>
+                    <p>
+                      Defina o que o aplicativo faz automaticamente depois de
+                      cada conversao.
+                    </p>
+                  </SectionHeader>
+
                   <FormGroup>
                     <CheckboxContainer>
                       <input
@@ -115,19 +135,35 @@ function WindowControls({
                         onChange={() => setOpenFolder(!openFolder)}
                       />
                       <Label htmlFor="openFolderCheckbox">
-                        Abrir pasta após conversão
+                        Abrir pasta apos a conversao
                       </Label>
                     </CheckboxContainer>
+                    <FieldDescription>
+                      Ative para revisar o arquivo final assim que o lote for
+                      concluido.
+                    </FieldDescription>
                   </FormGroup>
                 </>
               )}
+
               {activeTab === "avancado" && (
                 <>
-                  <h2>Configurações Avançadas</h2>
+                  <SectionHeader>
+                    <span>Avancado</span>
+                    <h2>Performance de codificacao</h2>
+                    <p>
+                      Equilibre velocidade, uso de CPU e suporte a aceleracao de
+                      hardware.
+                    </p>
+                  </SectionHeader>
+
                   <FormGroup>
-                    <Label htmlFor="cpuCoresBasic">
-                      Uso de núcleos da CPU:
-                    </Label>
+                    <FieldMeta>
+                      <Label htmlFor="cpuCoresBasic">Uso de nucleos da CPU</Label>
+                      <FieldDescription>
+                        Limite quantos nucleos o app pode usar em paralelo.
+                      </FieldDescription>
+                    </FieldMeta>
                     <Select
                       id="cpuCoresBasic"
                       value={cpuCores}
@@ -144,6 +180,7 @@ function WindowControls({
                       )}
                     </Select>
                   </FormGroup>
+
                   <FormGroup>
                     <CheckboxContainer>
                       <input
@@ -155,9 +192,12 @@ function WindowControls({
                         }
                       />
                       <Label htmlFor="hardwareAcceleration">
-                        Usar Aceleração de hardware
+                        Usar aceleracao de hardware
                       </Label>
                     </CheckboxContainer>
+                    <FieldDescription>
+                      Pode reduzir o tempo de exportacao em placas compativeis.
+                    </FieldDescription>
                   </FormGroup>
                 </>
               )}
@@ -171,172 +211,318 @@ function WindowControls({
 
 export default WindowControls;
 
-// Styled components
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0px;
-  border-bottom: 2px solid #181818;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  background:
+    radial-gradient(circle at left center, rgba(255, 123, 84, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
   -webkit-app-region: drag;
   user-select: none;
-  height: 50px;
+  min-height: 74px;
 `;
 
 const Left = styled.div`
   flex: 1;
+  min-width: 0;
 `;
 
 const Right = styled.div`
   display: flex;
+  gap: 10px;
   -webkit-app-region: no-drag;
+`;
 
-  .container {
-    gap: 10px;
-    display: flex;
-    align-items: center;
-    background-color: #2a2a2a;
-    border-radius: 5px;
-    margin: 5px;
+const ActionGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+`;
+
+const BrandBlock = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+`;
+
+const WorkspaceBadge = styled.span`
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(78, 189, 255, 0.18);
+  background: rgba(78, 189, 255, 0.1);
+  color: #d9f3ff;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  @media (max-width: 840px) {
+    display: none;
   }
 `;
 
 const IconButton = styled.button`
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text-main);
   cursor: pointer;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 999px;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
-    background-color: #8400ff;
+    background-color: rgba(255, 123, 84, 0.16);
+    color: #ffffff;
+    transform: translateY(-1px);
   }
 `;
 
 const Title = styled.h1`
-  font-size: 16px;
-  padding: 10px;
-  color: #fff;
-  user-select: none;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 12px;
+  min-width: 0;
+  font-size: 16px;
+  color: var(--text-main);
 
   img {
-    width: 35px;
+    width: 38px;
     object-fit: contain;
+    filter: drop-shadow(0 10px 18px rgba(255, 123, 84, 0.24));
+  }
+
+  strong {
+    display: block;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
 const SettingsOverlay = styled.div`
-  width: 100%;
-  height: 100%;
   position: absolute;
-  top: 0;
+  inset: 0;
   z-index: 999;
-  background-color: #000000dc;
+  background: rgba(4, 9, 17, 0.76);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 24px;
 `;
 
 const SettingsPanel = styled.div`
-  width: 80%;
-  height: 80%;
-  background-color: #202020;
-  border-radius: 10px;
+  position: relative;
+  width: min(980px, 100%);
+  min-height: 620px;
+  max-height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(18, 28, 44, 0.98),
+    rgba(10, 17, 28, 0.98)
+  );
+  border: 1px solid var(--line-soft);
+  border-radius: 32px;
   display: flex;
   overflow: hidden;
+  box-shadow: var(--shadow-panel);
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    min-height: 0;
+  }
 `;
 
 const SettingsSidebar = styled.div`
-  width: 200px;
-  background-color: #1a1a1a;
-  padding: 20px;
-  border-right: 1px solid #444;
-  color: #ccc;
+  width: 280px;
+  padding: 28px 20px;
+  border-right: 1px solid var(--line-soft);
+  background:
+    radial-gradient(circle at top left, rgba(255, 123, 84, 0.14), transparent 34%),
+    rgba(255, 255, 255, 0.03);
+  color: var(--text-soft);
+
+  @media (max-width: 900px) {
+    width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
 `;
 
 const SettingsContent = styled.div`
   flex: 1;
-  padding: 20px;
-  color: #fff;
-
-  h2 {
-    margin-bottom: 10px;
-  }
+  padding: 34px 28px 28px;
+  color: var(--text-main);
+  overflow: auto;
 `;
 
 const CloseSettingsButton = styled.button`
   position: absolute;
-  top: 15px;
+  top: 18px;
   right: 20px;
-  background: transparent;
-  border: none;
-  color: #ccc;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  color: var(--text-soft);
   cursor: pointer;
-  padding: 5px;
+  padding: 9px;
   z-index: 1;
   -webkit-app-region: no-drag;
+  transition: background-color 0.2s ease;
 
   &:hover {
     color: #fff;
-    background-color: #333;
-    border-radius: 4px;
+    background-color: rgba(255, 123, 84, 0.18);
   }
 `;
 
 const SidebarItem = styled.p<{ $active: boolean }>`
   margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
   cursor: pointer;
-  color: ${(props) => (props.$active ? "#fff" : "#ccc")};
-  font-weight: ${(props) => (props.$active ? "bold" : "normal")};
+  color: ${(props) => (props.$active ? "#fff" : "var(--text-soft)")};
+  font-weight: ${(props) => (props.$active ? "700" : "500")};
+  background: ${(props) =>
+    props.$active ? "rgba(255, 123, 84, 0.14)" : "transparent"};
+  border: 1px solid
+    ${(props) =>
+      props.$active ? "rgba(255, 123, 84, 0.2)" : "transparent"};
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     color: #fff;
+    background: rgba(255, 255, 255, 0.05);
   }
 `;
 
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 0px;
+  gap: 10px;
 
   input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #7b2cbf;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
     cursor: pointer;
   }
 `;
 
 const Label = styled.label`
   font-size: 14px;
-  color: #ddd;
+  color: var(--text-main);
+  font-weight: 600;
 `;
 
 const FormGroup = styled.div`
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  border-bottom: 1px solid #383838;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--line-soft);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 16px;
 `;
 
 const Select = styled.select`
-  background-color: #2e2e2e;
-  color: white;
-  border: 0px;
-  border-radius: 6px;
-  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  padding: 12px 14px;
   font-size: 14px;
   outline: none;
-  transition: 0.2s;
-  min-width: 100px;
+  transition: border-color 0.2s ease;
+  min-width: 160px;
 
   &:focus {
-    border-color: #7b2cbf;
+    border-color: rgba(255, 123, 84, 0.55);
   }
+`;
+
+const SidebarIntro = styled.div`
+  margin-bottom: 28px;
+
+  span {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--accent-cool);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    color: var(--text-main);
+    font-size: 24px;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+`;
+
+const SectionHeader = styled.div`
+  margin-bottom: 24px;
+
+  span {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 28px;
+  }
+
+  p {
+    max-width: 560px;
+    color: var(--text-soft);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+`;
+
+const FieldMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const FieldDescription = styled.span`
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
 `;
